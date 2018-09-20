@@ -1,0 +1,8 @@
+assignment_01/__pycache__
+assignment_01/__pycache__/*
+assignment_01/lfw
+assignment_01/lfw/*
+*.txt
+*.pdf
+assignment_01/.vscode/*
+assignment_01/.vscode
