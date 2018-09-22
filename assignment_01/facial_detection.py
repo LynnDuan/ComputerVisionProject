@@ -1,77 +1,112 @@
 #!usr/bin/python3
 import numpy as np
 import torch
-import math
 import torch.nn as nn
-import torch.nn.functional as f
 import torch.utils.model_zoo as model_zoo
+from torch.autograd import Variable
+import matplotlib.pyplot as plt
 import resnet
-model = resnet.resnet18(pretrained=True,num_classes=18)
+import data_process as dp
+
+# use ResNet18
+net = resnet.resnet18(pretrained=True,num_classes=18)
 
 ## lock the layer before fc layer
 #ct = 0
-#for child in model.children() :
+#for child in net.children() :
 #    ct += 1
 #    if ct < 9:
 #        for param in child.parameters():
 #            param.requires_grad = False
 
-
-## load and split data for training/validation/testing
-import os
-label_file_path = 'LFW_annotation_train.txt'
+torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 
-data_list = []
-with open(label_file_path,"r") as f:
-    for line in f:
-        tokens = line.split('\t') #split the line with ' '
-        print(tokens)
-        file_path = tokens[0].strip()
+# Begin training
+train_set_path = 'LFW_annotation_train.txt'
+max_epochs = 180
+learning_rate = 0.0005
+str_pre = 'pre'
+file_name = 'lfw_resnet_'+str(learning_rate)++'_'+str(max_epochs)+'_'+str_pre
 
-        face_bbox = []
-        for i in range(1, 5):
-            face_bbox.append(int(tokens[i]))
-        face_bbox = np.array(face_bbox, dtype=np.int)
+train_list = dp.get_list(train_set_path)
+valid_list = train_list[-2000: ]
+train_list = train_list[: -2000]
 
-        canthus_rr = []
-        for i in range(5, 7):
-            canthus_rr.append(float(tokens[i]))
-        canthus_rr = np.array(canthus_rr, dtype=np.float32)
+transform = ['flip','rcrop']
+train_dataset = dp.LFWDataSet(train_list,transform=transform)
+train_date_loader = torch.utils.data.DataLoader(train_dataset,
+                                                batch_size=64,
+                                                shuffle=False,
+                                                num_workers=0)
+valid_dataset = dp.LFWDataSet(valid_list, transform=transform)
+valid_data_loader = torch.utils.data.DataLoader(valid_dataset,
+                                                batch_size=64,
+                                                shuffle=True,
+                                                num_workers=0)
+net.cuda()
 
-        canthus_rl = []
-        for i in range(7, 9):
-            canthus_rl.append(float(tokens[i]))
-        canthus_rl = np.array(canthus_rl, dtype=np.float32)
+criterion = torch.nn.MSELoss().cuda()
+optimizer = torch.optim.Adam(net.parameters(), lr = learning_rate)
 
-        canthus_lr = []
-        for i in range(9, 11):
-            canthus_lr.append(float(tokens[i]))
-        canthus_lr = np.array(canthus_lr, dtype=np.float32)
+train_losses = []
+valid_losses = []
+itr = 0
+for opoch_idx in range(0, max_epochs):
+    for train_batch_idx, (train_input, train_lm) in enumerate(train_data_loader):
+        itr += 1
+        net.train()
+        optimizer.zero_grad()
+        print(train_input.shape)
+        train_input = torch.transpose(train_input,1,3)
+        print(train_input.shape)
+        train_input = Variable(train_input.cuda())
+        train_out = net.forward(train_input)
 
-        canthus_ll = []
-        for i in range(11, 13):
-            canthus_ll.append(float(tokens[i]))
-        canthus_ll = np.array(canthus_ll, dtype=np.float32)
+        train_lm = Variable(train_lm.cuda())
+        loss = criterion(train_out.view(-1,2,7),train_lm)
 
-        mouth_r = []
-        for i in range(13,15):
-            mouth_r.append(float(tokens[i]))
-        mouth_r = np.array(mouth_r,dtype=np.float32)
+        loss.backward()
+        optimizer.step()
+        train_losses.append((itr, loss.item()))
+ # add validation while training
+        if train_batch_idx % 200 == 0:
+            print('Epoch: %d Itr: %d Loss: %f' %(epoch_idx, itr, loss.item()))
+            net.eval()
+            valid_loss_set = []
+            valid_itr = 0
 
-        mouth_l = []
-        for i in range(15,17):
-            mouth_l.append(float(tokens[i]))
-        mouth_l = np.array(mouth_l,dtype=np.float32)
+            for valid_batch_idx, (valid_input, valid_lm) in enumerate(valid_data_loader):
+                net.eval()
+                valid_input = torch.transpose(valid_input,1,3)
+                valid_out = net.forward(valid_input)
+                
+                valid_lm = Variable(valid_lm.cuda())
+                valid_loss = criterion(valid_out.view((-1,2,7)),valid_lm)
+                valid_loss_set.append(valid_loss.item())
 
-        nose = []
-        for i in range(17,19):
-            nose.append(float(tokens[i]))
-        nose = np.array(nose,dtype=np.float32)
+                valid_loss_set.append(valid_loss.item())
 
+                valid_itr += 1
+                if valid_itr > 5:
+                    break
 
+                avg_valid_loss = np.mean(np.asarray(valid_loss_set))
+                print('Valid Epoch: %d Itr: %d Loss: %f' % (epoch_idx, itr, avg_valid_loss))
+                valid_losses.append((itr, avg_valid_loss))
 
-        data_list.append({'file_path': file_path, 'face_bbox': face_bbox, 'canthus_rr':canthus_rr, 'canthus_rl':canthus_rl, 'canthus_lr':canthus_lr,'canthus_ll':canthus_ll, 'mouth_r':mouth_r, 'mouth_l':mouth_l, 'nose':nose})
+train_losses = np.asarray(train_losses)
+valid_losses = np.asarray(valid_losses)
+plt.plot(train_losses[:, 0],
+         train_losses[:, 1])
+plt.plot(valid_losses[:, 0],
+         valid_losses[:, 1])
+# plt.show()
+plt.savefig(file_name+'.jpg')
+
+net_state = net.state_dict()
+torch.save(net_state,  os.path.join('.', file_name+'.pth'))
+
 
 
 
