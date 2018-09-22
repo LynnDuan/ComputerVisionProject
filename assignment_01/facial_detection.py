@@ -27,7 +27,7 @@ train_set_path = 'LFW_annotation_train.txt'
 max_epochs = 180
 learning_rate = 0.0005
 str_pre = 'pre'
-file_name = 'lfw_resnet_'+str(learning_rate)++'_'+str(max_epochs)+'_'+str_pre
+file_name = 'lfw_resnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre
 
 train_list = dp.get_list(train_set_path)
 valid_list = train_list[-2000: ]
