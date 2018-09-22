@@ -1,6 +1,7 @@
 #!usr/bin/python3
 import numpy as np
 import torch
+import os
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 from torch.autograd import Variable
@@ -35,7 +36,7 @@ train_list = train_list[: -2000]
 
 transform = ['flip','rcrop']
 train_dataset = dp.LFWDataSet(train_list,transform=transform)
-train_date_loader = torch.utils.data.DataLoader(train_dataset,
+train_data_loader = torch.utils.data.DataLoader(train_dataset,
                                                 batch_size=64,
                                                 shuffle=False,
                                                 num_workers=0)
@@ -52,7 +53,7 @@ optimizer = torch.optim.Adam(net.parameters(), lr = learning_rate)
 train_losses = []
 valid_losses = []
 itr = 0
-for opoch_idx in range(0, max_epochs):
+for epoch_idx in range(0, max_epochs):
     for train_batch_idx, (train_input, train_lm) in enumerate(train_data_loader):
         itr += 1
         net.train()
