@@ -6,3 +6,4 @@ assignment_01/lfw/*
 *.pdf
 assignment_01/.vscode/*
 assignment_01/.vscode
+*.pth
