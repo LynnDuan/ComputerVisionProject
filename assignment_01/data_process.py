@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
 
-img_size = 225
+img_size = 224
 random_crop_r = 5
 # lfw_dir = '../../../../Courses_data'
 #lfw_dataset_dir = '../../../../Courses_data/lfw'
