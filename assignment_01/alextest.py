@@ -39,7 +39,7 @@ net.classifier = nn.Sequential(
         )
 net.cuda()
 
-test_net_state = torch.load(os.path.join(lfw_dir, file_name+'.pth'))
+test_net_state = torch.load(os.path.join('.', file_name+'.pth'))
 net.load_state_dict(test_net_state)
 net.eval()
 

@@ -100,8 +100,12 @@ for epoch_idx in range(0, max_epochs):
                     break
             
             avg_valid_loss = np.mean(np.asarray(valid_loss_set))
-            print('Valid Epoch: %d Itr: %d Loss: %f' % (epoch_idx, itr, avg_valid_loss))
+            print('Valid Epoch: %d Itr: %d Loss: %f' % (epoch_idx, valid_itr, avg_valid_loss))
             valid_losses.append((itr, avg_valid_loss))
+            if (avg_valid_loss < 0.002):
+                    file_name += str(epoch_idx)
+                    flag = 1
+                    break
 
 train_losses = np.asarray(train_losses)
 valid_losses = np.asarray(valid_losses)
