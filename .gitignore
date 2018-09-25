@@ -9,3 +9,5 @@ assignment_01/.vscode
 *.pth
 *.jpg
 *.png
+*.log
+*.aux
