@@ -7,3 +7,5 @@ assignment_01/lfw/*
 assignment_01/.vscode/*
 assignment_01/.vscode
 *.pth
+*.jpg
+*.png
