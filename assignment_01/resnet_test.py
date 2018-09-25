@@ -50,7 +50,8 @@ dist_test = []
 test_lm_list = np.array(test_lm_list)
 result = np.array(result)
 print('result_size', len(result))
-dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2))
+dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2)) ##calculate the images' radious
+#dist_test = np.linalg.norm(test_lm_list - result,axis=2).flatten() ##calculate the images' radious
 # dist_test = np.sqrt(np.square(test_lm_list - result))
 percent = []
 for i in range(0,20):
@@ -67,32 +68,32 @@ plt.plot(step, percent)
 plt.show()
 
 
-# ## write result file
-# ## format: name '\t' original lm[x1,y1] ' ' ... '\t' output lm [x1',y1'] ' '
-# file = open(file_name+'.txt', 'w')
-# for idx in range(0, len(test_list)):
-#     file.write(test_list[idx]['name'] + '\t')
-#     for item in test_lm_list[idx]:
-#         file.write(str(item.squeeze()) + ' ')
-#     file.write('\t')
-#     for item in result[idx]:
-#         file.write(str(item.squeeze()) + ' ')
-#     file.write('\n')
-# file.close()
-# print('finish writing')
+## write result file
+## format: name '\t' original lm[x1,y1] ' ' ... '\t' output lm [x1',y1'] ' '
+file = open(file_name+'.txt', 'w')
+for idx in range(0, len(test_list)):
+    file.write(test_list[idx]['name'] + '\t')
+    for item in test_lm_list[idx]:
+        file.write(str(item.squeeze()) + ' ')
+    file.write('\t')
+    for item in result[idx]:
+        file.write(str(item.squeeze()) + ' ')
+    file.write('\n')
+file.close()
+print('finish writing')
 
-# ## show some result
-# show_list = test_list[random.randint(0, len(test_list)-4):-1]
-# show_dataset = dp.LFWDataSet(show_list)
-# show_data_loader = torch.utils.data.DataLoader(show_dataset,
-#                                                 batch_size=4,
-#                                                 shuffle=False,
-#                                                 num_workers=0)
+## show some result
+show_list = test_list[random.randint(0, len(test_list)-4):-1]
+show_dataset = dp.LFWDataSet(show_list)
+show_data_loader = torch.utils.data.DataLoader(show_dataset,
+                                                batch_size=4,
+                                                shuffle=False,
+                                                num_workers=0)
 
-# idx, (img, lm) = next(enumerate(show_data_loader))
-# test_input = torch.transpose(img, 1, 3)
-# test_lm = net.forward(test_input.cuda())
-# test_lm = test_lm.view((-1, 2, 7)).cpu().detach().numpy()
+idx, (img, lm) = next(enumerate(show_data_loader))
+test_input = torch.transpose(img, 1, 3)
+test_lm = net.forward(test_input.cuda())
+test_lm = test_lm.view((-1, 2, 7)).cpu().detach().numpy()
 
 
 

@@ -59,8 +59,8 @@ dist_test = []
 test_lm_list = np.array(test_lm_list)
 result = np.array(result)
 print('result_size', len(result))
-dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2))
-# dist_test = np.sqrt(np.square(test_lm_list - result))
+dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2)) ##calculate the images' radious
+#dist_test = np.linalg.norm(test_lm_list - result,axis=2).flatten() ##calculate the images' radious
 percent = []
 for i in range(0,20):
     percent.append(len(np.where(dist_test < i/10.0)[0])*1.0/len(test_lm_list)) 

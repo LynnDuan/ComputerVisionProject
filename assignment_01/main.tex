@@ -1,0 +1,147 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lachaise Assignment
+% LaTeX Template
+% Version 1.0 (26/6/2018)
+%
+% This template originates from:
+% http://www.LaTeXTemplates.com
+%
+% Authors:
+% Marion Lachaise & François Févotte
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	ASSIGNMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{CMPT742: Assignment \#1} % Title of the assignment
+
+\author{Lin Duan 301369502 \& Jingwen Zhang\\ \texttt{duanlind@sfu.ca \& jingwen\_zhang\_2\@sfu.ca}} % Author name and email address
+
+\date{Simon Fraser University--- \today} % University, school and/or department name(s) and a date
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	INTRODUCTION
+%----------------------------------------------------------------------------------------
+
+\section*{Introduction} % Unnumbered section
+
+In this assignment we use AlexNet and Resnet18 as the training model to detect the facial landmark. And in this report, we will first describe the network struture and the training process (data augmentation, learning rate parameters…). Then we will show the training/validation loss curve from both Alexnet and Resnet18. Finally, we will show the test result from both.
+
+
+% Math equation/formula
+\begin{equation}
+	I = \int_{a}^{b} f(x) \; \text{d}x.
+\end{equation}
+
+
+\begin{info} % Information block
+
+\end{info}
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{Problem title} % Numbered section
+
+
+
+%------------------------------------------------
+
+\subsection{Theoretical viewpoint}
+
+
+
+% Numbered question, with subquestions in an enumerate environment
+\begin{question}
+	Quisque ullamcorper placerat ipsum. Cras nibh. Morbi vel justo vitae lacus tincidunt ultrices. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+
+	% Subquestions numbered with letters
+	\begin{enumerate}[(a)]
+		\item Do this.
+		\item Do that.
+		\item Do something else.
+	\end{enumerate}
+\end{question}
+	
+%------------------------------------------------
+
+\subsection{Algorithmic issues}
+um sagittis, enim ex maximus velit, id semper nisi velit eu purus.
+
+\begin{center}
+	\begin{minipage}{0.5\linewidth} % Adjust the minipage width to accomodate for the length of algorithm lines
+		\begin{algorithm}[H]
+			\KwIn{$(a, b)$, two floating-point numbers}  % Algorithm inputs
+			\KwResult{$(c, d)$, such that $a+b = c + d$} % Algorithm outputs/results
+			\medskip
+			\If{$\vert b\vert > \vert a\vert$}{
+				exchange $a$ and $b$ \;
+			}
+			$c \leftarrow a + b$ \;
+			$z \leftarrow c - a$ \;
+			$d \leftarrow b - z$ \;
+			{\bf return} $(c,d)$ \;
+			\caption{\texttt{FastTwoSum}} % Algorithm name
+			\label{alg:fastTwoSum}   % optional label to refer to
+		\end{algorithm}
+	\end{minipage}
+\end{center}
+
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 2
+%----------------------------------------------------------------------------------------
+
+\section{Implementation}
+
+
+% File contents
+\begin{file}[hello.py]
+\begin{lstlisting}[language=Python]
+#! /usr/bin/python
+
+import sys
+sys.stdout.write("Hello World!\n")
+\end{lstlisting}
+\end{file}
+
+% Command-line "screenshot"
+\begin{commandline}
+	\begin{verbatim}
+		$ chmod +x hello.py
+		$ ./hello.py
+
+		Hello World!
+	\end{verbatim}
+\end{commandline}
+
+
+% Warning text, with a custom title
+\begin{warn}[Notice:]
+  
+\end{warn}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
