@@ -18,7 +18,7 @@ torch.set_default_tensor_type('torch.cuda.FloatTensor')
 # Begin training
 train_set_path = 'LFW_annotation_train.txt'
 max_epochs = 50
-learning_rate = 0.0005
+learning_rate = 0.0001
 str_pre = 'pre'
 file_name = 'lfw_resnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre
 

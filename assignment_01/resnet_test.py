@@ -12,7 +12,7 @@ from PIL import Image
 
 test_set_path = 'LFW_annotation_test.txt'
 max_epochs = 50
-learning_rate = 0.0005
+learning_rate = 0.0001
 pretrained = True
 str_pre = 'pre'
 file_name = 'lfw_resnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre + '46'
