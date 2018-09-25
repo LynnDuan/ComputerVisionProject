@@ -54,13 +54,10 @@ dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2)) ##calculate the ima
 #dist_test = np.linalg.norm(test_lm_list - result,axis=2).flatten() ##calculate the images' radious
 # dist_test = np.sqrt(np.square(test_lm_list - result))
 percent = []
-for i in range(0,20):
-    percent.append(len(np.where(dist_test < i/10.0)[0])*1.0/len(test_lm_list)) 
+for i in range(0,150):
+    percent.append(len(np.where(dist_test < i/100.0)[0])*1.0/len(test_lm_list)) 
     # print('len',len(np.where(dist_test < i/10.0)))
-step = np.arange(0,2,0.1)
-# print('percent',percent)
-# print('result',result)
-# print('test_lm_list',test_lm_list)
+step = np.arange(0,1.5,0.01)
 print('dist_test', dist_test)
 print('dist_test_len', len(dist_test))
 
