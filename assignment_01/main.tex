@@ -43,46 +43,142 @@
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
 
-\section*{Introduction} % Unnumbered section
+\section*{Introducation} % Unnumbered section
 
 In this assignment we use AlexNet and Resnet18 as the training model to detect the facial landmark. And in this report, we will first describe the network struture and the training process (data augmentation, learning rate parameters…). Then we will show the training/validation loss curve from both Alexnet and Resnet18. Finally, we will show the test result from both.
 
 
-% Math equation/formula
-\begin{equation}
-	I = \int_{a}^{b} f(x) \; \text{d}x.
-\end{equation}
-
-
-\begin{info} % Information block
-
-\end{info}
-
-%----------------------------------------------------------------------------------------
-%	PROBLEM 1
-%----------------------------------------------------------------------------------------
-
-\section{Problem title} % Numbered section
+\section{Network Structure} % Numbered section
 
 
 
 %------------------------------------------------
 
-\subsection{Theoretical viewpoint}
+\subsection{Alexnet Structure}
+
+The Alexnet structure adapts to this project would be:
+
+\begin{center} 
+	\begin{tabular}{ | l | l |} 
+		\hline 
+		Layer Name & Tensor Size      \\ \hline 
+		iuput image & 227$\times$227$\times$3   \\ \hline 
+		Conv\-1 & 55$\times$55$\times$96   \\ \hline 
+		Maxpool-1 & 27$\times$27$\times$96   \\ \hline 
+		Conv\-2 & 27$\times$27$\times$256   \\ \hline 
+		Maxpool-2 & 13$\times$13$\times$256   \\ \hline 
+		Conv\-3 & 13$\times$13$\times$384   \\ \hline 
+		Conv\-4 & 13$\times$13$\times$384   \\ \hline 
+		Conv\-5 & 13$\times$13$\times$256   \\ \hline 
+		Maxpool-3 & 6$\times$6$\times$256   \\ \hline
+		FC\-1 & 512  \\ \hline
+		FC\-2 & 256  \\ \hline
+		FC\-3 & 7$\times$2  \\ \hline
+		Output & 14  \\ \hline
+
+	\end{tabular}  
+\end{center} 
 
 
 
-% Numbered question, with subquestions in an enumerate environment
-\begin{question}
-	Quisque ullamcorper placerat ipsum. Cras nibh. Morbi vel justo vitae lacus tincidunt ultrices. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+\begin{commandline}
+	\begin{verbatim}
+net = models.alexnet(pretrained=pretrained)
+net.classifier = nn.Sequential(
+nn.Dropout(),
+nn.Linear(256 * 6 * 6, 512),
+nn.ReLU(inplace=True),
+nn.Dropout(),
+nn.Linear(512, 256),
+nn.ReLU(inplace=True),
+nn.Linear(256, 14),
+)
+net.cuda()
+	\end{verbatim}
+\end{commandline}
 
-	% Subquestions numbered with letters
-	\begin{enumerate}[(a)]
-		\item Do this.
-		\item Do that.
-		\item Do something else.
-	\end{enumerate}
-\end{question}
+
+
+
+
+
+\subsection{Resnet Structure}
+
+We use Resnet18 as our training model. The Resnet18 structure adapts to this project would be:
+
+\begin{center} 
+	\begin{tabular}{ | l | l | l |} 
+		\hline 
+		Layer Name & Tensor Size      & 18\-layer  \\ \hline 
+		conv1  & 112$\times$112 & 7$\times$7,stride 2  \\ \hline 
+		&                         & 3$\times$3 max pool,stride 2  \\ \hline 
+		conv2\_ x    &  56$\times$56  & \( \left [  \begin{array}{lcl}  3 \times 3, 64 \\   3 \times 3, 64    \end{array}   \right] \times 2 \)\\ \hline
+		conv3\_ x    &  28$\times$28  & \( \left [  \begin{array}{lcl}  3 \times 3, 128\\   3 \times 3, 128   \end{array}   \right] \times 2 \)\\ \hline
+		conv4\_ x    &  14$\times$14  & \( \left [  \begin{array}{lcl}  3 \times 3, 256\\   3 \times 3, 256   \end{array}   \right] \times 2 \)\\ \hline
+		conv5\_ x    &  7$\times$7     & \( \left [  \begin{array}{lcl}  3 \times 3, 512\\   3 \times 3, 512 \end{array}   \right] \times 2 \)\\ \hline
+		& 1$\times 1$     & average pool, 14\-d fc, softmax \\ \hline
+	\end{tabular}  
+\end{center} 
+
+\begin{file}[hello.py]
+	\begin{lstlisting}[language=Python]
+	#! /usr/bin/python3
+	import resnet
+	\end{lstlisting}
+\end{file}
+
+And part of the commond line for Resnet18 would be:
+\begin{commandline}
+	\begin{verbatim}
+def resnet18(pretrained=False, **kwargs):
+"""Constructs a ResNet-18 model.
+
+Args:
+pretrained (bool): If True, returns a model pre-trained on ImageNet
+"""
+model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+if pretrained:
+# model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
+pretrained_dict = model_zoo.load_url(model_urls['resnet18'])
+model_dict = model.state_dict()
+# 1. filter out unnecessary keys
+pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict 
+... : and v.size() ==model_dict[k].size()}
+# 2. overwrite entries in the existing state dict
+model_dict.update(pretrained_dict) 
+# 3. load the new state dict
+model.load_state_dict(model_dict)
+return model
+	\end{verbatim}
+\end{commandline}
+
+\section{Training Process}
+\subsection{Data Augumentation}
+In order to prevent overfitting, we implement augmentation on images in two ways: Random Cropping and Random Flipping.
+
+Random cropping means to manipulate the bonuding box by adding random offset.
+
+\begin{commandline}
+	\begin{verbatim}
+
+	\end{verbatim}
+\end{commandline}
+
+
+Random filpping means to flip the image horizontally. 
+
+\begin{commandline}
+	\begin{verbatim}
+	
+	\end{verbatim}
+\end{commandline}
+
+\subsection{Learning Parameters}
+ We  choose 'Adam-Adaptive Moment Estimation' as optimizer. And we set learning rate to 0.0005.
+ 
+ 
+
+
 	
 %------------------------------------------------
 
@@ -109,32 +205,6 @@ um sagittis, enim ex maximus velit, id semper nisi velit eu purus.
 \end{center}
 
 
-%----------------------------------------------------------------------------------------
-%	PROBLEM 2
-%----------------------------------------------------------------------------------------
-
-\section{Implementation}
-
-
-% File contents
-\begin{file}[hello.py]
-\begin{lstlisting}[language=Python]
-#! /usr/bin/python
-
-import sys
-sys.stdout.write("Hello World!\n")
-\end{lstlisting}
-\end{file}
-
-% Command-line "screenshot"
-\begin{commandline}
-	\begin{verbatim}
-		$ chmod +x hello.py
-		$ ./hello.py
-
-		Hello World!
-	\end{verbatim}
-\end{commandline}
 
 
 % Warning text, with a custom title
