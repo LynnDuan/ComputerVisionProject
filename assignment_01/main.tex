@@ -17,9 +17,13 @@
 
 %----------------------------------------------------------------------------------------
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+
 %----------------------------------------------------------------------------------------
 
 \documentclass{article}
+
+\usepackage{graphicx} 
+\usepackage{subfigure}
 
 \input{structure.tex} % Include the file specifying the document structure and custom commands
 
@@ -120,7 +124,7 @@ We use Resnet18 as our training model. The Resnet18 structure adapts to this pro
 	\end{tabular}  
 \end{center} 
 
-\begin{file}[hello.py]
+\begin{file}[resnet\_train.py]
 	\begin{lstlisting}[language=Python]
 	#! /usr/bin/python3
 	import resnet
@@ -160,6 +164,23 @@ Random cropping means to manipulate the bonuding box by adding random offset.
 
 \begin{commandline}
 	\begin{verbatim}
+	 # random crop
+	if 'rcrop' in self.transform:
+	if random.random() < 0.5:
+	top = np.random.randint(0, int(landmarks[:,0].min() - bbox[0][0])+1) - random_crop_r
+	left = np.random.randint(0, int(landmarks[:,1].min() - bbox[0][1])+1) - random_crop_r
+	offset = [[top,left],[top,left]]
+	bbox += offset
+	img = img.crop((bbox[0][0], bbox[0][1], bbox[1][0], bbox[1][1]))
+	img = img.resize((img_size, img_size))
+	landmarks_ = []
+	for coor in landmarks:
+	coor = coor - bbox[0]
+	coor[0] = coor[0] / w  # 0~225
+	coor[1] = coor[1] / h 
+	landmarks_.append(coor)
+	landmarks_ = np.array(landmarks_, dtype=np.float).T
+	
 
 	\end{verbatim}
 \end{commandline}
@@ -169,48 +190,86 @@ Random filpping means to flip the image horizontally.
 
 \begin{commandline}
 	\begin{verbatim}
+	# random flip
+	if 'flip' in self.transform:
+	if random.random() < 0.5:
+	img = img.transpose(Image.FLIP_LEFT_RIGHT)
+	landmarks_[0] = np.ones(7) - landmarks_[0]
 	
+	img = np.array(img, dtype=np.float) / 255.0 * 2 - 1
+	img_tensor = torch.from_numpy(img).float()
+	landmarks_tensor = torch.from_numpy(landmarks_).float()
 	\end{verbatim}
 \end{commandline}
 
 \subsection{Learning Parameters}
- We  choose 'Adam-Adaptive Moment Estimation' as optimizer. And we set learning rate to 0.0005.
+ We  choose 'Adam-Adaptive Moment Estimation' as optimizer. And we set learning rate to 0.0001.
  
  
 
 
 	
 %------------------------------------------------
+\newpage
+\section{Lossing Curve }
 
-\subsection{Algorithmic issues}
-um sagittis, enim ex maximus velit, id semper nisi velit eu purus.
+First, the lossing curve of Alexnet training is as following:
 
-\begin{center}
-	\begin{minipage}{0.5\linewidth} % Adjust the minipage width to accomodate for the length of algorithm lines
-		\begin{algorithm}[H]
-			\KwIn{$(a, b)$, two floating-point numbers}  % Algorithm inputs
-			\KwResult{$(c, d)$, such that $a+b = c + d$} % Algorithm outputs/results
-			\medskip
-			\If{$\vert b\vert > \vert a\vert$}{
-				exchange $a$ and $b$ \;
-			}
-			$c \leftarrow a + b$ \;
-			$z \leftarrow c - a$ \;
-			$d \leftarrow b - z$ \;
-			{\bf return} $(c,d)$ \;
-			\caption{\texttt{FastTwoSum}} % Algorithm name
-			\label{alg:fastTwoSum}   % optional label to refer to
-		\end{algorithm}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=3in]{alexloss}
+	\caption{alexnet-lossing curve}
+\end{figure}
+
+The loss decline quickly in the first few iterations. 
+
+Then, lossing curve of Resxnet training is as following:
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=3in]{resloss.jpg}
+	\caption{resnet-lossing curve}
+\end{figure}
+
+\newpage
+\section{Result and Accuracy}
+
+We can see the test result and accuracy from Alexnet as below:(run for 80 epoches)
+
+\begin{figure}[h]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{alexresult.png}
+		\caption{alex-result}
+		\label{fig:side:a}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{alexradius.jpg}
+		\caption{alex-accuracy}
+		\label{fig:side:b}
 	\end{minipage}
-\end{center}
+\end{figure}
+ 
+ From the left image, we can see the test result is almost accurate with little deviation. The right image shows that within radius of and more than 0.2, nearly all test results are similar with original data.
+ 
+The result and accuracy of Resnet :(run for 70 epoches)
 
-
+\begin{figure}[h]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{resresult.png}
+		\caption{res-result}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{resradius.png}
+		\caption{res-accuracy}
+	\end{minipage}
+\end{figure}
 
 
 % Warning text, with a custom title
-\begin{warn}[Notice:]
-  
-\end{warn}
 
 %----------------------------------------------------------------------------------------
 
