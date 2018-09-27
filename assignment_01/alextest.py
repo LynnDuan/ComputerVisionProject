@@ -14,7 +14,7 @@ test_set_path = 'LFW_annotation_test.txt'
 # lfw_dataset_dir = '../../../../Courses_data/lfw'
 # test_set_path = os.path.join(lfw_dir, 'LFW_annotation_test.txt')
 max_epochs = 180
-learning_rate = 0.0005
+learning_rate = 0.0001
 pretrained = True
 str_pre = 'pre'
 file_name = 'lfw_alexnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre
@@ -62,10 +62,10 @@ print('result_size', len(result))
 dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2)) ##calculate the images' radious
 #dist_test = np.linalg.norm(test_lm_list - result,axis=2).flatten() ##calculate the images' radious
 percent = []
-for i in range(0,20):
-    percent.append(len(np.where(dist_test < i/10.0)[0])*1.0/len(test_lm_list)) 
+for i in range(0,150):
+    percent.append(len(np.where(dist_test < i/100.0)[0])*1.0/len(test_lm_list)) 
    
-step = np.arange(0,2,0.1)
+step = np.arange(0,1.5,0.01)
 
 plt.plot(step, percent)
 plt.show()

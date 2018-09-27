@@ -86,6 +86,7 @@ class LFWDataSet(Dataset):
             if random.random() < 0.5:
                 img = img.transpose(Image.FLIP_LEFT_RIGHT)
                 landmarks_[0] = np.ones(7) - landmarks_[0]
+                landmarks_ = landmarks_[:,[3,2,1,0,5,4,6]]#change order
         
         img = np.array(img, dtype=np.float) / 255.0 * 2 - 1
         img_tensor = torch.from_numpy(img).float()
