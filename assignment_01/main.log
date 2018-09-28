@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  27 SEP 2018 00:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  27 SEP 2018 23:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1416,7 +1416,14 @@ TLF.
 LaTeX Font Info:    Font shape `T1/XCharter-TLF/m/n' will be
 (Font)              scaled to size 10.0pt on input line 42.
 
-(./main.aux)
+(./main.aux
+
+LaTeX Warning: Label `fig:side:a' multiply defined.
+
+
+LaTeX Warning: Label `fig:side:b' multiply defined.
+
+)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 42.
@@ -1583,49 +1590,63 @@ Overfull \hbox (39.89694pt too wide) in paragraph at lines 185--185
 ][1])+1) - random_crop_r[] 
  []
 
-[2] [3]
-<alexloss.jpg, id=25, 462.528pt x 346.896pt>
+[2]
+<data_aug_origin.png, id=22, 321.2pt x 237.88875pt>
+File: data_aug_origin.png Graphic file (type png)
+<use data_aug_origin.png>
+Package pdftex.def Info: data_aug_origin.png  used on input line 207.
+(pdftex.def)             Requested size: 180.67499pt x 133.8157pt.
+<data_aug.png, id=24, 321.2pt x 237.88875pt>
+File: data_aug.png Graphic file (type png)
+<use data_aug.png>
+Package pdftex.def Info: data_aug.png  used on input line 213.
+(pdftex.def)             Requested size: 180.67499pt x 133.8157pt.
+ [3 <./data_aug_origin.png> <./data_aug.png>]
+<alexloss.jpg, id=30, 462.528pt x 346.896pt>
 File: alexloss.jpg Graphic file (type jpg)
 <use alexloss.jpg>
-Package pdftex.def Info: alexloss.jpg  used on input line 220.
+Package pdftex.def Info: alexloss.jpg  used on input line 236.
 (pdftex.def)             Requested size: 216.81pt x 162.60709pt.
-<resloss.jpg, id=26, 462.528pt x 346.896pt>
+<resloss.jpg, id=31, 462.528pt x 346.896pt>
 File: resloss.jpg Graphic file (type jpg)
 <use resloss.jpg>
-Package pdftex.def Info: resloss.jpg  used on input line 230.
+Package pdftex.def Info: resloss.jpg  used on input line 246.
 (pdftex.def)             Requested size: 216.81pt x 162.60709pt.
  [4 <./alexloss.jpg> <./resloss.jpg>]
-<alexresult.png, id=30, 321.2pt x 237.88875pt>
+<alexresult.png, id=35, 321.2pt x 237.88875pt>
 File: alexresult.png Graphic file (type png)
 <use alexresult.png>
-Package pdftex.def Info: alexresult.png  used on input line 242.
+Package pdftex.def Info: alexresult.png  used on input line 258.
 (pdftex.def)             Requested size: 180.67499pt x 133.8157pt.
-<alexradius.jpg, id=32, 462.528pt x 346.896pt>
+<alexradius.jpg, id=36, 462.528pt x 346.896pt>
 File: alexradius.jpg Graphic file (type jpg)
 <use alexradius.jpg>
-Package pdftex.def Info: alexradius.jpg  used on input line 248.
+Package pdftex.def Info: alexradius.jpg  used on input line 264.
 (pdftex.def)             Requested size: 180.67499pt x 135.5059pt.
-<resresult.png, id=33, 462.528pt x 346.896pt>
+<resresult.png, id=37, 462.528pt x 346.896pt>
 File: resresult.png Graphic file (type png)
 <use resresult.png>
-Package pdftex.def Info: resresult.png  used on input line 261.
+Package pdftex.def Info: resresult.png  used on input line 277.
 (pdftex.def)             Requested size: 180.67499pt x 135.5059pt.
-<resradius.png, id=34, 462.528pt x 346.896pt>
+<resradius.png, id=38, 462.528pt x 346.896pt>
 File: resradius.png Graphic file (type png)
 <use resradius.png>
-Package pdftex.def Info: resradius.png  used on input line 266.
+Package pdftex.def Info: resradius.png  used on input line 282.
 (pdftex.def)             Requested size: 180.67499pt x 135.5059pt.
  [5 <./alexresult.png> <./alexradius.jpg> <./resresult.png> <./resradius.png>] 
 (./main.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 27338 strings out of 492649
- 519778 string characters out of 6129622
- 577998 words of memory out of 5000000
- 30773 multiletter control sequences out of 15000+600000
+ 27349 strings out of 492649
+ 520008 string characters out of 6129622
+ 578039 words of memory out of 5000000
+ 30782 multiletter control sequences out of 15000+600000
  578587 words of font info for 71 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  69i,14n,74p,10488b,1458s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1641,10 +1662,10 @@ b></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
 sr/local/texlive/2018/texmf-dist/fonts/type1/public/cm-super/sfss1000.pfb></usr
 /local/texlive/2018/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb></usr/l
 ocal/texlive/2018/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb>
-Output written on main.pdf (5 pages, 483602 bytes).
+Output written on main.pdf (5 pages, 718517 bytes).
 PDF statistics:
- 75 PDF objects out of 1000 (max. 8388607)
+ 79 PDF objects out of 1000 (max. 8388607)
  48 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 43 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 53 words of extra memory for PDF output out of 10000 (max. 10000000)
 

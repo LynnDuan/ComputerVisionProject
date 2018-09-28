@@ -33,7 +33,7 @@
 
 \title{CMPT742: Assignment \#1} % Title of the assignment
 
-\author{Lin Duan 301369502 \& Jingwen Zhang\\ \texttt{duanlind@sfu.ca \& jingwen\_zhang\_2\@sfu.ca}} % Author name and email address
+\author{Lin Duan 301369502 \& Jingwen Zhang 301368992\\ \texttt{duanlind@sfu.ca \& jingwen\_zhang\_2\@sfu.ca}} % Author name and email address
 
 \date{Simon Fraser University--- \today} % University, school and/or department name(s) and a date
 
@@ -49,7 +49,7 @@
 
 \section*{Introducation} % Unnumbered section
 
-In this assignment we use AlexNet and Resnet18 as the training model to detect the facial landmark. And in this report, we will first describe the network struture and the training process (data augmentation, learning rate parameters…). Then we will show the training/validation loss curve from both Alexnet and Resnet18. Finally, we will show the test result from both.
+In this assignment we use AlexNet and ResNet18 as the training model to detect the facial landmark from RBG images. The dataset we used is Labeled Faces in the Wild from http://vis-www.cs.umass.edu/lfw/, with Landmark Annotation on http://cmp.felk.cvut.cz/~uricamic/flandmark/. In this report, we will first describe the network struture and the training process (eg. data augmentation, learning rate parameters). Then we will show the training and validation loss curve from both AlexNet and ResNet18. Finally, we will show the test result from both.
 
 
 \section{Network Structure} % Numbered section
@@ -58,9 +58,9 @@ In this assignment we use AlexNet and Resnet18 as the training model to detect t
 
 %------------------------------------------------
 
-\subsection{Alexnet Structure}
+\subsection{AlexNet Structure}
 
-The Alexnet structure adapts to this project would be:
+The AlexNet structure adapts to this project would be:
 
 \begin{center} 
 	\begin{tabular}{ | l | l |} 
@@ -106,9 +106,9 @@ net.cuda()
 
 
 
-\subsection{Resnet Structure}
+\subsection{ResNet Structure}
 
-We use Resnet18 as our training model. The Resnet18 structure adapts to this project would be:
+We use ResNet18 as our training model. The ResNet18 structure adapts to this project would be:
 
 \begin{center} 
 	\begin{tabular}{ | l | l | l |} 
@@ -131,7 +131,7 @@ We use Resnet18 as our training model. The Resnet18 structure adapts to this pro
 	\end{lstlisting}
 \end{file}
 
-And part of the commond line for Resnet18 would be:
+And part of the commond line for ResNet18 would be:
 \begin{commandline}
 	\begin{verbatim}
 def resnet18(pretrained=False, **kwargs):
@@ -160,7 +160,7 @@ return model
 \subsection{Data Augumentation}
 In order to prevent overfitting, we implement augmentation on images in two ways: Random Cropping and Random Flipping.
 
-Random cropping means to manipulate the bonuding box by adding random offset.
+We do the random cropping by manipulating the bounding box by adding random offset.
 
 \begin{commandline}
 	\begin{verbatim}
@@ -186,7 +186,7 @@ Random cropping means to manipulate the bonuding box by adding random offset.
 \end{commandline}
 
 
-Random filpping means to flip the image horizontally. 
+Random filpping means to flip the image horizontally. While the landmark position to be flipped, the order of different kinds of landmarks has to be changed as well.
 
 \begin{commandline}
 	\begin{verbatim}
@@ -196,45 +196,61 @@ Random filpping means to flip the image horizontally.
 	img = img.transpose(Image.FLIP_LEFT_RIGHT)
 	landmarks_[0] = np.ones(7) - landmarks_[0]
 	
-	img = np.array(img, dtype=np.float) / 255.0 * 2 - 1
-	img_tensor = torch.from_numpy(img).float()
-	landmarks_tensor = torch.from_numpy(landmarks_).float()
 	\end{verbatim}
 \end{commandline}
 
+Samples of original images and after implementing data augmentation are shown as below.
+
+\begin{figure}[h]
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{data_aug_origin.png}
+		\caption{original images}
+		\label{fig:side:a}
+	\end{minipage}%
+	\begin{minipage}[t]{0.5\linewidth}
+		\centering
+		\includegraphics[width=2.5in]{data_aug.png}
+		\caption{after data augmentation}
+		\label{fig:side:b}
+	\end{minipage}
+\end{figure}
+
+After data augmentation, we rescale the RGB pixel values from (0, 255) to (-1, 1), and also rescale the landmark position to (0, 1). In this way, the values will be more easier to be processed in Neural network. Then the images will be resize to (225, 225) for the input of AlexNet and ResNet.
+
 \subsection{Learning Parameters}
- We  choose 'Adam-Adaptive Moment Estimation' as optimizer. And we set learning rate to 0.0001.
+ We  choose 'Adam-Adaptive Moment Estimation' as optimizer with learning rate 0.0001. First we load the pretrained network of both AlexNet and ResNet18, but modify the fully-connected layers as mentioned before for our purpose. Then fine-tune the parameters using MSE Loss as loss function. Besides, there are 8000 training items and 2000 for validation.
+
  
  
 
 
 	
 %------------------------------------------------
-\newpage
 \section{Lossing Curve }
 
-First, the lossing curve of Alexnet training is as following:
+First, the lossing curve of AlexNet training is as following:
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=3in]{alexloss}
-	\caption{alexnet-lossing curve}
+	\includegraphics[width=3in]{alexloss.jpg}
+	\caption{AlexNet-lossing curve}
 \end{figure}
 
-The loss decline quickly in the first few iterations. 
+The loss declines quickly in the first few iterations. 
 
-Then, lossing curve of Resxnet training is as following:
+Then, lossing curve of ResNet training is as following:
 
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=3in]{resloss.jpg}
-	\caption{resnet-lossing curve}
+	\caption{ResNet-lossing curve}
 \end{figure}
 
 \newpage
 \section{Result and Accuracy}
 
-We can see the test result and accuracy from Alexnet as below:(run for 80 epoches)
+We can see the test result and accuracy from AlexNet as below:(run for 80 epoches)
 
 \begin{figure}[h]
 	\begin{minipage}[t]{0.5\linewidth}
@@ -253,7 +269,7 @@ We can see the test result and accuracy from Alexnet as below:(run for 80 epoche
  
  From the left image, we can see the test result is almost accurate with little deviation. The right image shows that within radius of and more than 0.2, nearly all test results are similar with original data.
  
-The result and accuracy of Resnet :(run for 70 epoches)
+The result and accuracy of ResNet :(run for 70 epoches)
 
 \begin{figure}[h]
 	\begin{minipage}[t]{0.5\linewidth}
