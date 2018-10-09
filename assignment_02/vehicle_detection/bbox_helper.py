@@ -78,7 +78,7 @@ def iou(a: torch.Tensor, b: torch.Tensor):
     assert b.dim() == 2
     assert b.shape[1] == 4
 
-    # TODO: implement IoU of two bounding box
+    # implement IoU of two bounding box
     x1_a = a[:,0]-a[:,2]/2 #left-top
     y1_a = a[:,1]-a[:,3]/2
     x4_a = a[:,0]+a[:,2]/2 #right-bottom
@@ -161,18 +161,33 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
     assert bbox_confid_scores.dim() == 2
     assert bbox_confid_scores.shape[0] == bbox_loc.shape[0]
 
-    sel_bbox = bbox
-
-    # Todo: implement nms for filtering out the unnecessary bounding boxes
+    sel_bbox = []
+    # implement nms for filtering out the unnecessary bounding boxes
     num_classes = bbox_confid_scores.shape[1]
+
     for class_idx in range(0, num_classes):
 
         # Tip: use prob_threshold to set the prior that has higher scores and filter out the low score items for fast
         # computation
+        scores = bbox_confid_scores[:,class_idx] 
+        scores = torch.where(scores > prob_threshold,scores,torch.zeros(scores.size()) )
+        non_zeros_scores = scores.nonzero()[:,0]
+        scores = scores[non_zeros_scores]
+        loc = bbox_loc[non_zeros_scores,:]
+        [vals,I] = torch.sort(scores,0,True)
+        while len(I) >0:
+            i = I[0]
+            sel_bbox.append(loc[i,:])
+            # compute IOU
+            tmp = loc[i,:].view(1,4)
+            for j in range(0,loc.shape[0]-1):
+                tmp = torch.cat((tmp,loc[i,:].view(1,4)),0)
+            I_o_u = iou(tmp,loc)
+            I = torch.where(I_o_u <= overlap_threshold,I,torch.zeros(I.size()))
+            non_zeros_I = I.nonzero()[:,0]
+            I = I[non_zeros_I]
+            loc = loc[non_zeros_I]
 
-
-
-        pass
 
     return sel_bbox
 
