@@ -4,15 +4,16 @@ import torch.optim as optim
 import cityscape_dataset as csd
 from torch.utils.data import Dataset
 from torch.autograd import Variable
-from bbox_helper import generate_prior_bboxes, match_priors
+from bbox_helper import generate_prior_bboxes, match_priors,nms_bbox,loc2bbox
 from data_loader import get_list
 from ssd_net import SSD
 from bbox_loss import MultiboxLoss
+from PIL import Image, ImageDraw
 
 use_gpu = True
 img_dir = '../cityscapes_samples/'
 label_dir = '../cityscapes_samples_labels/'
-learning_rate = 0.0001
+learning_rate = 0.001
 max_epochs = 20
 
 train_list = get_list(img_dir, label_dir)
@@ -21,8 +22,8 @@ print('list',train_list)
 # train_list = train_list[0:-20]
 train_dataset = csd.CityScapeDataset(train_list, train=True, show=False)
 train_data_loader = torch.utils.data.DataLoader(train_dataset,
-                                                batch_size=8,
-                                                shuffle=False,
+                                                batch_size=32,
+                                                shuffle=True,
                                                 num_workers=0)
 print('train items:', len(train_dataset))
 
@@ -69,7 +70,6 @@ for epoch_idx in range(0, max_epochs):
         conf_preds, loc_preds = net.forward(imgs)
         conf_loss, loc_huber_loss, loss = criterion.forward(conf_preds, loc_preds, conf_targets, loc_targets)
         
-        print('forward')
         loss.backward()
         optimizer.step()
         train_losses.append((itr, conf_loss.item(), loc_huber_loss.item(), loss.item()))
@@ -77,6 +77,15 @@ for epoch_idx in range(0, max_epochs):
         # if train_batch_idx % 2 == 0:
         print('Epoch: %d Itr: %d Conf_Loss: %f Loc_Loss: %f Loss: %f' 
                 % (epoch_idx, itr, conf_loss.item(), loc_huber_loss.item(), loss.item()))
+
+net.eval()
+
+#load test image
+img =  Image.open('../cityscapes_samples/bad-honnef/bad-honnef_000000_000000_leftImg8bit.png')
+
+
+
+
         '''
             net.eval() 
             valid_loss_set = []
