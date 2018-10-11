@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 ''' Prior Bounding Box  ------------------------------------------------------------------------------------------------
 '''
@@ -22,12 +23,13 @@ def generate_prior_bboxes(prior_layer_cfg):
     :param prior_layer_cfg: configuration for each feature layer, see the 'example_prior_layer_cfg' in the following.
     :return prior bounding boxes with form of (cx, cy, w, h), where the value range are from 0 to 1, dim (1, num_priors, 4)
     """
-    example_prior_layer_cfg = [
-        # Example:
-        {'layer_name': 'Conv4', 'feature_dim_hw': (64, 64), 'bbox_size': (60, 60), 'aspect_ratio': (1.0, 1 / 2, 1 / 3, 2.0, 3.0, 1.0)},
-        {'layer_name': 'Conv4', 'feature_dim_hw': (64, 64), 'bbox_size': (60, 60), 'aspect_ratio': (1.0, 1 / 2, 1 / 3, 2.0, 3.0, 1.0)}
-        # ...
-        # TODO: define your feature map settings
+    prior_layer_cfg = [
+        {'layer_name': 'mbn_Conv11', 'feature_dim_hw': (38, 38), 'bbox_size': (30, 30), 'aspect_ratio': (1 / 2, 1 / 3, 2.0, 3.0)},
+        {'layer_name': 'mbn_Conv13', 'feature_dim_hw': (19, 19), 'bbox_size': (60, 60), 'aspect_ratio': (1 / 2, 1 / 3, 2.0, 3.0)},
+        {'layer_name': 'Conv8_2', 'feature_dim_hw': (10, 10), 'bbox_size': (111, 111), 'aspect_ratio': (1 / 2, 1 / 3, 2.0, 3.0)},
+        {'layer_name': 'Conv9_2', 'feature_dim_hw': (5, 5), 'bbox_size': (162, 162), 'aspect_ratio': (1 / 2, 1 / 3, 2.0, 3.0)},
+        {'layer_name': 'Conv10_2', 'feature_dim_hw': (3, 3), 'bbox_size': (213, 213), 'aspect_ratio': (1 / 2, 1 / 3, 2.0, 3.0)},
+        {'layer_name': 'Conv11_2', 'feature_dim_hw': (1, 1), 'bbox_size': (264, 264), 'aspect_ratio': (1 / 2, 1 / 3, 2.0, 3.0)},
     ]
 
     priors_bboxes = []
@@ -36,22 +38,33 @@ def generate_prior_bboxes(prior_layer_cfg):
         layer_feature_dim = layer_cfg['feature_dim_hw']
         layer_aspect_ratio = layer_cfg['aspect_ratio']
 
-        # Todo: compute S_{k} (reference: SSD Paper equation 4.)
-        sk = 0
-        fk = 0
+        # TODO: compute S_{k} (reference: SSD Paper equation 4.)
+        fk = layer_feature_dim[0]
+        # sk = 0.2 + 0.7*feat_level_idx/(len(prior_layer_cfg)-1)
+        sk = layer_cfg['bbox_size'][0]/300
 
         for y in range(0, layer_feature_dim[0]):
-            for x in range(0,layer_feature_dim[0]):
+            for x in range(0, layer_feature_dim[0]):
 
-                # Todo: compute bounding box center
-                cx = 0
-                cy = 0
+                # TODO: compute bounding box center
+                cx = (x+0.5) / fk
+                cy = (y+0.5) / fk
+                # ar = 1
+                priors_bboxes.append([cx, cy, sk, sk])
 
-                # Todo: generate prior bounding box with respect to the aspect ratio
+                # TODO: generate prior bounding box with respect to the aspect ratio
                 for aspect_ratio in layer_aspect_ratio:
-                    h = 0
-                    w = 0
+                    h = sk/np.sqrt(aspect_ratio)
+                    w = sk*np.sqrt(aspect_ratio)
                     priors_bboxes.append([cx, cy, w, h])
+                # ar = 1, sk' = sqrt(sk*sk+1)
+                # sk_1 = 0.2 + 0.7*(feat_level_idx+1) / (len(prior_layer_cfg)-1)
+                if feat_level_idx == len(prior_layer_cfg)-1:
+                    sk_1 = 315/300
+                else:
+                    sk_1 = prior_layer_cfg[feat_level_idx+1]['bbox_size'][0]/300
+                sk_ = np.sqrt(sk_1*sk)
+                priors_bboxes.append([cx, cy, sk_, sk_])
 
     # Convert to Tensor
     priors_bboxes = torch.tensor(priors_bboxes)
@@ -128,10 +141,27 @@ def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels:
     assert prior_bboxes.dim() == 2
     assert prior_bboxes.shape[1] == 4
 
-    matched_boxes = None
-    matched_labels = None
+    gt_iou = torch.empty((gt_bboxes.shape[0], prior_bboxes.shape[0]))
+    # print('gt_bbox_num:', gt_bboxes.shape[0])
 
     # TODO: implement prior matching
+    for idx in range(0, gt_bboxes.shape[0]):
+        gt_bboxes_sample = torch.unsqueeze(gt_bboxes[idx], 0)
+        gt_iou[idx] = iou(prior_bboxes, gt_bboxes_sample)
+
+    iou_value, max_obj_idx = gt_iou.max(0) # belong to which obj
+    _, max_prior_bbox_idx = gt_iou.max(1) # belong to which prior box
+    matched_boxes = prior_bboxes
+    matched_labels = gt_labels[max_obj_idx]
+    matched_labels[iou_value<iou_threshold] = 0
+
+    # make sure for each gt, has at least a corresponding prior box 
+    for idx in range(gt_labels.shape[0]):
+        matched_boxes[max_prior_bbox_idx[idx]] = prior_bboxes[max_prior_bbox_idx[idx]]
+        matched_labels[max_prior_bbox_idx[idx]] = gt_labels[idx]
+
+    matched_boxes_offset = bbox2loc(torch.unsqueeze(gt_bboxes[max_obj_idx], 0), torch.unsqueeze(matched_boxes, 0))
+    matched_boxes_offset = torch.squeeze(matched_boxes_offset)
 
     # [DEBUG] Check if output is the desire shape
     assert matched_boxes.dim() == 2
@@ -139,7 +169,8 @@ def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels:
     assert matched_labels.dim() == 1
     assert matched_labels.shape[0] == matched_boxes.shape[0]
 
-    return matched_boxes, matched_labels
+    return matched_boxes, matched_labels, matched_boxes_offset
+
 
 
 ''' NMS ----------------------------------------------------------------------------------------------------------------

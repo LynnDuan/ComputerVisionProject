@@ -46,20 +46,24 @@ class MultiboxLoss(nn.Module):
         :param gt_bbox_loc: ground-truth bounding box for prior, dim: (N, H*W*num_prior, 4)
         :return:
         """
+        
         # Do the hard negative mining and produce balanced positive and negative examples
         with torch.no_grad():
             neg_class_prob = -F.log_softmax(confidence, dim=2)[:, :, self.neg_label_idx]      # select neg. class prob.
             pos_flag, neg_flag = hard_negative_mining(neg_class_prob, gt_class_labels, neg_pos_ratio=self.neg_pos_ratio)
             sel_flag = pos_flag | neg_flag
-            num_pos = pos_flag.sum(dim=1, keepdim=True)
+            # num_pos = pos_flag.sum(dim=1, keepdim=True).float()
+            num_pos = pos_flag.sum().float()
 
         # Loss for the classification
         num_classes = confidence.shape[2]
         sel_conf = confidence[sel_flag]
-        conf_loss = F.cross_entropy(sel_conf.reshape(-1, num_classes), gt_class_labels[sel_flag]) / num_pos
-
+        conf_loss = F.cross_entropy(sel_conf.reshape(-1, num_classes), gt_class_labels[sel_flag].long()) / num_pos
+ 
         # Loss for the bounding box prediction
-        loc_huber_loss = None
         # TODO: implementation on bounding box regression
+        loc_huber_loss = F.smooth_l1_loss(pred_loc[sel_flag], gt_bbox_loc[sel_flag]) / num_pos
 
-        return conf_loss, loc_huber_loss
+        loss = conf_loss + loc_huber_loss
+
+        return conf_loss, loc_huber_loss, loss

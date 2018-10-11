@@ -40,11 +40,11 @@ class MobileNet(nn.Module):
             conv_dw(512, 1024, 2),
             conv_dw(1024, 1024, 1),     # 13
         )
-        self.fc = nn.Linear(1024, num_classes)
+        # self.fc = nn.Linear(1024, num_classes)
 
     def forward(self, x):
         x = self.conv_layers(x)
         x = F.avg_pool2d(x, 7)
         x = x.view(-1, 1024)
-        x = self.fc(x)
+        # x = self.fc(x)
         return x
