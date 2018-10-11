@@ -14,8 +14,8 @@ format: dict {'img': img_path, 'h': float, 'w': float,
 
 def get_list(img_dir, label_dir):
     label_dict_file = 'label_dict.csv'
-    img_list = glob.glob(os.path.join(img_dir, '*/*'))
-    label_list = glob.glob(os.path.join(label_dir, '*/*.json'))
+    img_list = sorted(glob.glob(os.path.join(img_dir, '*/*')))
+    label_list = sorted(glob.glob(os.path.join(label_dir, '*/*.json')))
     label_dict = {'bicycle': 1, 'bicyclegroup': 1, 'bus': 1, 'busgroup': 1, 'caravan': 1,
                 'car': 1, 'cargroup': 1, 'motorcycle': 1, 'motorcyclegroup': 1, 
                 'on rails': 1, 'person': 2, 'persongroup': 2, 'rider': 2, 

@@ -110,7 +110,7 @@ class CityScapeDataset(Dataset):
         return bbox_offset_tensor, bbox_label_tensor, img_tensor
 
     def random_flip(self, img, boxes):
-        if random.random() < 1:
+        if random.random() < 0.5:
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
             xmin = img.width - boxes[:,1,0]
             xmax = img.width - boxes[:,0,0]

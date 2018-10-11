@@ -16,9 +16,10 @@ learning_rate = 0.0001
 max_epochs = 20
 
 train_list = get_list(img_dir, label_dir)
+print('list',train_list)
 # valid_list = train_list[-20: ]
 # train_list = train_list[0:-20]
-train_dataset = csd.CityScapeDataset(train_list, train=True, show=True)
+train_dataset = csd.CityScapeDataset(train_list, train=True, show=False)
 train_data_loader = torch.utils.data.DataLoader(train_dataset,
                                                 batch_size=8,
                                                 shuffle=False,
@@ -32,12 +33,12 @@ idx, (bbox, label, img) = next(enumerate(train_data_loader))
 # valid_data_loader = torch.utils.data.DataLoader(valid_dataset,
 #                                                 batch_size=4,
 #                                                 shuffle=False,
-#                                                 num_workers=0)
+#                                                  num_workers=0)
 # print('validation items:', len(valid_dataset))
-'''
+
 net = SSD(3)
 optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9, weight_decay=1e-4)
-# optimizer = torch.optim.Adam(net.parameters(), lr = learning_rate)
+optimizer = torch.optim.Adam(net.parameters(), lr = learning_rate)
 criterion = MultiboxLoss([0.1,0.1,0.2,0.2])
 
 if use_gpu:
@@ -76,36 +77,38 @@ for epoch_idx in range(0, max_epochs):
         # if train_batch_idx % 2 == 0:
         print('Epoch: %d Itr: %d Conf_Loss: %f Loc_Loss: %f Loss: %f' 
                 % (epoch_idx, itr, conf_loss.item(), loc_huber_loss.item(), loss.item()))
-        #     net.eval() 
-        #     valid_loss_set = []
-        #     valid_itr = 0
+        '''
+            net.eval() 
+            valid_loss_set = []
+            valid_itr = 0
 
-            # for valid_batch_idx, (valid_input, valid_lm) in enumerate(valid_data_loader):
-            #     net.eval()
-            #     valid_input = torch.transpose(valid_input, 1, 3)
-            #     valid_input = Variable(valid_input.cuda())
-            #     valid_out = net.forward(valid_input)
+            for valid_batch_idx, (valid_input, valid_lm) in enumerate(valid_data_loader):
+                net.eval()
+                valid_input = torch.transpose(valid_input, 1, 3)
+                valid_input = Variable(valid_input.cuda())
+                valid_out = net.forward(valid_input)
 
-            #     valid_lm = Variable(valid_lm.cuda())
-            #     valid_loss = criterion(valid_out.view((-1, 2, 7)), valid_lm)
-            #     valid_loss_set.append(valid_loss.item())
+                valid_lm = Variable(valid_lm.cuda())
+                valid_loss = criterion(valid_out.view((-1, 2, 7)), valid_lm)
+                valid_loss_set.append(valid_loss.item())
 
-            #     valid_itr += 1
-            #     if valid_itr > 5:
-            #         break
+                valid_itr += 1
+                if valid_itr > 5:
+                    break
             
-            # avg_valid_loss = np.mean(np.asarray(valid_loss_set))
-            # print('Valid Epoch: %d Itr: %d Loss: %f' % (epoch_idx, itr, avg_valid_loss))
-            # valid_losses.append((itr, avg_valid_loss))
+            avg_valid_loss = np.mean(np.asarray(valid_loss_set))
+            print('Valid Epoch: %d Itr: %d Loss: %f' % (epoch_idx, itr, avg_valid_loss))
+            valid_losses.append((itr, avg_valid_loss))
 
-# train_losses = np.asarray(train_losses)
-# valid_losses = np.asarray(valid_losses)
-# plt.plot(train_losses[:, 0],
-#          train_losses[:, 1])
-# plt.plot(valid_losses[:, 0],
-#          valid_losses[:, 1])
-# plt.show()
-# plt.savefig(file_name+'.jpg')
+train_losses = np.asarray(train_losses)
+valid_losses = np.asarray(valid_losses)
+plt.plot(train_losses[:, 0],
+         train_losses[:, 1])
+plt.plot(valid_losses[:, 0],
+         valid_losses[:, 1])
+plt.show()
+plt.savefig(file_name+'.jpg')
 
-# net_state = net.state_dict()
-# torch.save(net_state, os.path.join(lfw_dir, file_name+'.pth'))'''
+net_state = net.state_dict()
+torch.save(net_state, os.path.join(lfw_dir, file_name+'.pth'))
+'''

@@ -5,7 +5,7 @@ import numpy as np
 '''
 
 
-def generate_prior_bboxes(prior_layer_cfg):
+def generate_prior_bboxes():
     """
     Generate prior bounding boxes on different feature map level. This function used in 'cityscape_dataset.py'
 
@@ -92,29 +92,51 @@ def iou(a: torch.Tensor, b: torch.Tensor):
     assert b.shape[1] == 4
 
     # implement IoU of two bounding box
-    x1_a = a[:,0]-a[:,2]/2 #left-top
-    y1_a = a[:,1]-a[:,3]/2
-    x4_a = a[:,0]+a[:,2]/2 #right-bottom
-    y4_a = a[:,1]+a[:,3]/2
+    # x1_a = a[:,0]-a[:,2]/2 #left-top
+    # y1_a = a[:,1]-a[:,3]/2
+    # x4_a = a[:,0]+a[:,2]/2 #right-bottom
+    # y4_a = a[:,1]+a[:,3]/2
     
-    x1_b = b[:,0]-b[:,2]/2 #left-top
-    y1_b = b[:,1]-b[:,3]/2
-    x4_b = b[:,0]+b[:,2]/2 #right-bottom
-    y4_b = b[:,1]+b[:,3]/2
+    # x1_b = b[:,0]-b[:,2]/2 #left-top
+    # y1_b = b[:,1]-b[:,3]/2
+    # x4_b = b[:,0]+b[:,2]/2 #right-bottom
+    # y4_b = b[:,1]+b[:,3]/2
 
-    x1_intersection = torch.max(x1_a,x1_b)
-    y1_intersection = torch.max(y1_a,y1_b)
-    x4_intersection = torch.min(x4_a,x4_b)
-    y4_intersection = torch.min(y4_a,y4_b)
+    # x1_intersection = torch.max(x1_a,x1_b)
+    # y1_intersection = torch.max(y1_a,y1_b)
+    # x4_intersection = torch.min(x4_a,x4_b)
+    # y4_intersection = torch.min(y4_a,y4_b)
 
-    x1_uniom = torch.min(x1_a,x1_b)
-    y1_uniom = torch.min(y1_a,y1_b)
-    x4_uniom = torch.max(x4_a,x4_b)
-    y4_uniom = torch.max(y4_a,y4_b)
+    # x1_uniom = torch.min(x1_a,x1_b)
+    # y1_uniom = torch.min(y1_a,y1_b)
+    # x4_uniom = torch.max(x4_a,x4_b)
+    # y4_uniom = torch.max(y4_a,y4_b)
 
-    iou = (x4_intersection-x1_intersection)*(y4_intersection-y1_intersection)/((x4_uniom-x1_uniom)*(y4_uniom-y1_uniom))
-    tmp = torch.zeros(iou.size())
-    iou = torch.max(iou,tmp)
+    # iou = (x4_intersection-x1_intersection)*(y4_intersection-y1_intersection)/((x4_uniom-x1_uniom)*(y4_uniom-y1_uniom))
+    # tmp = torch.zeros(iou.size())
+    # iou = torch.max(iou,tmp)
+    iou = np.zeros(a.shape[0])
+    if b.shape[0] == 1:
+        b = b.expand(a.shape[0], 4)
+
+    left = torch.max(a[:,0]-a[:,2]/2.0, b[:,0]-b[:,2]/2.0)
+    top = torch.max(a[:,1]-a[:,3]/2.0, b[:,1]-b[:,3]/2.0)
+    right = torch.min(a[:,0]+a[:,2]/2.0, b[:,0]+b[:,2]/2.0)
+    bottom = torch.min(a[:,1]+a[:,3]/2.0, b[:,1]+b[:,3]/2.0)
+
+    w = right - left
+    h = bottom - top
+    h[h<0] = 0
+    w[w<0] = 0
+    inter = w * h
+    union = a[:,2]*a[:,3]+b[:,2]*b[:,3] - inter
+    iou = inter / union
+
+    iou = torch.tensor(iou)
+
+
+
+
     # [DEBUG] Check if output is the desire shape
     assert iou.dim() == 1
     assert iou.shape[0] == a.shape[0]
