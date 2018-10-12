@@ -49,7 +49,7 @@
 
 \section*{Introducation} % Unnumbered section
 
-In this assignment we use AlexNet and ResNet18 as the training model to detect the facial landmark from RBG images. The dataset we used is Labeled Faces in the Wild from http://vis-www.cs.umass.edu/lfw/, with Landmark Annotation on http://cmp.felk.cvut.cz/~uricamic/flandmark/. In this report, we will first describe the network struture and the training process (eg. data augmentation, learning rate parameters). Then we will show the training and validation loss curve from both AlexNet and ResNet18. Finally, we will show the test result from both.
+In this assignment we use AlexNet and ResNet18 as the training model to detect the facial landmarks from RBG images. The dataset we used is Labeled Faces in the Wild from http://vis-www.cs.umass.edu/lfw/, with Landmark Annotation on http://cmp.felk.cvut.cz/~uricamic/flandmark/. In this report, we will first describe the network struture and the training process (eg. data augmentation, learning rate parameters). Then we will show the training and validation loss curves from both AlexNet and ResNet18. Finally, we will show the test results from both.
 
 
 \section{Network Structure} % Numbered section
@@ -186,7 +186,7 @@ We do the random cropping by manipulating the bounding box by adding random offs
 \end{commandline}
 
 
-Random filpping means to flip the image horizontally. While the landmark position to be flipped, the order of different kinds of landmarks has to be changed as well.
+Random filpping means to flip the image horizontally. While the landmark position to be flipped, the order of different kinds of landmarks have to be changed as well.
 
 \begin{commandline}
 	\begin{verbatim}
@@ -283,6 +283,8 @@ The result and accuracy of ResNet :(run for 70 epoches)
 		\caption{res-accuracy}
 	\end{minipage}
 \end{figure}
+
+We can see clearly that the result of ResNet is grown quicker than of AlexNet.
 
 
 % Warning text, with a custom title
