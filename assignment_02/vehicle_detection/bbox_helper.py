@@ -223,6 +223,30 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
 
         # Tip: use prob_threshold to set the prior that has higher scores and filter out the low score items for fast
         # computation
+        scores = bbox_confid_scores[:,class_idx]
+        ids = (scores >= prob_threshold).nonzero()[:,0].squeeze()
+        loc = bbox_loc[ids,:]
+        scores = scores[ids]
+        [_,order] = torch.sort(scores,0,True)
+        sel_bbox = []
+        while len(sel_bbox) > 0:
+            i = order[0]
+            sel_bbox.append(loc[i,:])
+            if len(order) == 1:
+                break
+            # compute IOU
+            tmp = loc[i,:].view(1,4)
+            for j in range(0,loc.shape[0]-1):
+                tmp = torch.cat((tmp,loc[i,:].view(1,4)),0)
+            I_o_u = iou(tmp,loc)
+            ids = (I_o_u <= overlap_threshold).nonzero()[:,0].squeeze()
+            if len(ids) = 0:
+                break
+            order = order[ids+1]
+
+
+
+        '''
         scores = bbox_confid_scores[:,class_idx] 
         scores = torch.where(scores > prob_threshold,scores,torch.zeros(scores.size()) )
         non_zeros_scores = scores.nonzero()[:,0]
@@ -240,7 +264,7 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
             I = torch.where(I_o_u <= overlap_threshold,I,torch.zeros(I.size()))
             non_zeros_I = I.nonzero()[:,0]
             I = I[non_zeros_I]
-            loc = loc[non_zeros_I]
+            loc = loc[non_zeros_I]'''
 
 
     return sel_bbox
