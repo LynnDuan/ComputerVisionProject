@@ -17,7 +17,7 @@ torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 # Begin training
 train_set_path = 'LFW_annotation_train.txt'
-max_epochs = 50
+max_epochs = 70
 learning_rate = 0.0001
 str_pre = 'pre'
 file_name = 'lfw_resnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre
@@ -91,10 +91,10 @@ for epoch_idx in range(0, max_epochs):
                 avg_valid_loss = np.mean(np.asarray(valid_loss_set))
                 print('Valid Epoch: %d Itr: %d Loss: %f' % (epoch_idx, valid_itr, avg_valid_loss))
                 valid_losses.append((itr, avg_valid_loss))
-                if (avg_valid_loss < 0.002):
-                    file_name += str(epoch_idx)
-                    flag = 1
-                    break
+                # if (avg_valid_loss < 0.001):
+                #     file_name += str(epoch_idx)
+                #     flag = 1
+                #     break
 
 train_losses = np.asarray(train_losses)
 valid_losses = np.asarray(valid_losses)
@@ -102,14 +102,8 @@ plt.plot(train_losses[:, 0],
          train_losses[:, 1])
 plt.plot(valid_losses[:, 0],
          valid_losses[:, 1])
-plt.show()
+# plt.show()
 plt.savefig(file_name+'.jpg')
 
 net_state = net.state_dict()
 torch.save(net_state,  os.path.join('.', file_name+'.pth'))
-
-
-
-
-
-

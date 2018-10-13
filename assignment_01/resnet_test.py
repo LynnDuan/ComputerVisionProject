@@ -11,11 +11,11 @@ import random
 from PIL import Image
 
 test_set_path = 'LFW_annotation_test.txt'
-max_epochs = 50
+max_epochs = 70
 learning_rate = 0.0001
 pretrained = True
 str_pre = 'pre'
-file_name = 'lfw_resnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre + '46'
+file_name = 'lfw_resnet_'+str(learning_rate)+'_'+str(max_epochs)+'_'+str_pre
 
 test_list = dp.get_list(test_set_path)
 test_dataset = dp.LFWDataSet(test_list)
@@ -54,10 +54,10 @@ dist_test = np.linalg.norm(test_lm_list - result,axis=(1,2)) ##calculate the ima
 #dist_test = np.linalg.norm(test_lm_list - result,axis=2).flatten() ##calculate the images' radious
 # dist_test = np.sqrt(np.square(test_lm_list - result))
 percent = []
-for i in range(0,150):
+for i in range(0,40):
     percent.append(len(np.where(dist_test < i/100.0)[0])*1.0/len(test_lm_list)) 
     # print('len',len(np.where(dist_test < i/10.0)))
-step = np.arange(0,1.5,0.01)
+step = np.arange(0,0.4,0.01)
 print('dist_test', dist_test)
 print('dist_test_len', len(dist_test))
 
@@ -94,7 +94,7 @@ test_lm = test_lm.view((-1, 2, 7)).cpu().detach().numpy()
 
 
 
-# nd_img = img.cpu().numpy()
-# nd_lm = lm.cpu().numpy()
-# # dp.show_landmarks(nd_img, nd_lm) # ground truth
-# dp.show_landmarks(nd_img, test_lm)
+nd_img = img.cpu().numpy()
+nd_lm = lm.cpu().numpy()
+# dp.show_landmarks(nd_img, nd_lm) # ground truth
+dp.show_landmarks(nd_img, test_lm)
