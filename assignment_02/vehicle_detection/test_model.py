@@ -25,7 +25,7 @@ print('list',test_list)
 # test_list = test_list[0:-20]
 test_dataset = csd.CityScapeDataset(test_list, train=False, show=False)
 test_data_loader = torch.utils.data.DataLoader(test_dataset,
-                                                batch_size=32,
+                                                batch_size=16,
                                                 shuffle=False,
                                                 num_workers=0)
 print('test items:', len(test_dataset))
@@ -47,18 +47,43 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
   imgs = Variable(imgs)
   conf, loc = net.forward(imgs)
   conf = conf[0,...]
-  loc = loc[0,...]
-
+  loc = loc[0,...].cpu()
+  
   prior =  test_dataset.get_prior_bbox()
   prior = torch.unsqueeze(prior, 0)
-  prior = prior.cuda()
+  # prior = prior.cuda()
   real_bounding_box = loc2bbox(loc,prior,center_var=0.1,size_var=0.2)
   real_bounding_box = torch.squeeze(real_bounding_box,0)
-  print('real_bounding_box',real_bounding_box.shape)
   sel_box = nms_bbox(real_bounding_box, conf, overlap_threshold=0.5, prob_threshold=0.6)
 
+  # img = Image.open(os.path.join(img_dir, 'bad-honnef', 'bad-honnef_000000_000000_leftImg8bit.png'))
+  img = imgs[0].permute(1,2,0).contiguous()
+  true_loc = loc_targets[0,conf_targets[0,...].nonzero(),:].squeeze()
+  img = Image.fromarray(np.uint8(img*128 + 127))
+  draw = ImageDraw.Draw(img)
+  sel_box = np.array(sel_box)
+  print('sel_box.shape',sel_box)
+  for box in range(0,sel_box.shape[0]):
+    sel_cx = sel_box[box,0]
+    sel_cy = sel_box[box,1]
+    sel_w = sel_box[box,2]
+    sel_h = sel_box[box,3]
+    sel_bbox = np.array([sel_cx-sel_w/2,sel_cy-sel_h/2,sel_cx+sel_w/2,sel_cy+sel_h/2])
+    sel_bbox = sel_bbox*128+127
+    draw.rectangle(list(sel_bbox), outline='red')
+  for b in range(0,true_loc.shape[0]):
+    cx = true_loc[b,0]
+    cy = true_loc[b,1]
+    w = true_loc[b,2]
+    h = true_loc[b,3]
+    true_bbox = [cx-w/2, cy-h/2, cx+w/2, cy+h/2]
+    true_bbox = np.array(true_bbox)*128 +127
+    draw.rectangle(list(true_bbox), outline='green')
 
+    # print(box.shape)
+    print('tls', true_loc[b,:]*128 + 127)
 
+  img.show()
   break
 
   print('conf',conf.shape)

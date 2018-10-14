@@ -92,7 +92,7 @@ def iou(a: torch.Tensor, b: torch.Tensor):
     assert b.dim() == 2
     assert b.shape[1] == 4
 
-    # implement IoU of two bounding box
+    # # implement IoU of two bounding box
     # x1_a = a[:,0]-a[:,2]/2 #left-top
     # y1_a = a[:,1]-a[:,3]/2
     # x4_a = a[:,0]+a[:,2]/2 #right-bottom
@@ -115,7 +115,8 @@ def iou(a: torch.Tensor, b: torch.Tensor):
 
     # iou = (x4_intersection-x1_intersection)*(y4_intersection-y1_intersection)/((x4_uniom-x1_uniom)*(y4_uniom-y1_uniom))
     # tmp = torch.zeros(iou.size())
-    # iou = torch.max(iou,tmp)
+    # iou = torch.max(iou.cuda(),tmp.cuda())
+    
     iou = np.zeros(a.shape[0])
     if b.shape[0] == 1:
         b = b.expand(a.shape[0], 4)
@@ -134,9 +135,6 @@ def iou(a: torch.Tensor, b: torch.Tensor):
     iou = inter / union
 
     iou = torch.tensor(iou)
-
-
-
 
     # [DEBUG] Check if output is the desire shape
     assert iou.dim() == 1
@@ -214,35 +212,42 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
     assert bbox_loc.shape[1] == 4
     assert bbox_confid_scores.dim() == 2
     assert bbox_confid_scores.shape[0] == bbox_loc.shape[0]
-
-    sel_bbox = []
+    bbox_loc = bbox_loc.cpu()
+    bbox_confid_scores = bbox_confid_scores.cpu()
     # implement nms for filtering out the unnecessary bounding boxes
     num_classes = bbox_confid_scores.shape[1]
-
-    for class_idx in range(0, num_classes):
+    sel_bbox = []
+    print('bbox size', bbox_loc.numel())
+    for class_idx in range(1, num_classes):
 
         # Tip: use prob_threshold to set the prior that has higher scores and filter out the low score items for fast
         # computation
         scores = bbox_confid_scores[:,class_idx]
-        ids = (scores >= prob_threshold).nonzero()[:,0].squeeze()
+        ids = (scores >= prob_threshold).nonzero().squeeze()
+        if ids.numel() == 0: 
+            continue
+        print('ids size', class_idx, ids.numel())
         loc = bbox_loc[ids,:]
         scores = scores[ids]
         [_,order] = torch.sort(scores,0,True)
-        sel_bbox = []
-        while len(sel_bbox) > 0:
+        while order.numel()> 0:
             i = order[0]
-            sel_bbox.append(loc[i,:])
-            if len(order) == 1:
+            print('order size', order.numel(), i, loc.numel()) 
+            sel_bbox.append(loc[i,:].detach().cpu().numpy())
+            if order.numel() == 1:
                 break
             # compute IOU
             tmp = loc[i,:].view(1,4)
             for j in range(0,loc.shape[0]-1):
                 tmp = torch.cat((tmp,loc[i,:].view(1,4)),0)
             I_o_u = iou(tmp,loc)
-            ids = (I_o_u <= overlap_threshold).nonzero()[:,0].squeeze()
-            if len(ids) = 0:
+            ids = (I_o_u <= overlap_threshold).nonzero().squeeze()
+            if ids.numel() == 0:
                 break
-            order = order[ids+1]
+            scores = scores[ids]
+            loc = loc[ids,:]
+            [_,order] = torch.sort(scores,0,True)
+
 
 
 

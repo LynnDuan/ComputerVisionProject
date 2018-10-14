@@ -16,7 +16,7 @@ use_gpu = True
 img_dir = '../cityscapes_samples/'
 label_dir = '../cityscapes_samples_labels/'
 learning_rate = 0.001
-max_epochs = 20
+max_epochs = 200
 
 train_list = get_list(img_dir, label_dir)
 print('list',train_list)
