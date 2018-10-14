@@ -179,8 +179,8 @@ def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels:
     matched_labels[iou_value<iou_threshold] = 0
 
     # make sure for each gt, has at least a corresponding prior box 
-    for idx in range(gt_labels.shape[0]):
-        matched_boxes[max_prior_bbox_idx[idx]] = prior_bboxes[max_prior_bbox_idx[idx]]
+    for idx in range(1,gt_labels.shape[0]):
+        # matched_boxes[max_prior_bbox_idx[idx]] = prior_bboxes[max_prior_bbox_idx[idx]]
         matched_labels[max_prior_bbox_idx[idx]] = gt_labels[idx]
 
     matched_boxes_offset = bbox2loc(torch.unsqueeze(gt_bboxes[max_obj_idx], 0), torch.unsqueeze(matched_boxes, 0))
@@ -224,10 +224,11 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
         # Tip: use prob_threshold to set the prior that has higher scores and filter out the low score items for fast
         # computation
         scores = bbox_confid_scores[:,class_idx] 
-        scores = torch.where(scores > prob_threshold,scores,torch.zeros(scores.size()) )
+        scores = torch.where(scores > prob_threshold,scores,torch.zeros(scores.size()).cuda() )
         non_zeros_scores = scores.nonzero()[:,0]
         scores = scores[non_zeros_scores]
         loc = bbox_loc[non_zeros_scores,:]
+        tmp_loc = loc
         [vals,I] = torch.sort(scores,0,True)
         while len(I) >0:
             i = I[0]
@@ -237,7 +238,7 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
             for j in range(0,loc.shape[0]-1):
                 tmp = torch.cat((tmp,loc[i,:].view(1,4)),0)
             I_o_u = iou(tmp,loc)
-            I = torch.where(I_o_u <= overlap_threshold,I,torch.zeros(I.size()))
+            I = torch.where(I_o_u <= overlap_threshold,I,torch.zeros(I.size(), dtype=torch.long).cuda())
             non_zeros_I = I.nonzero()[:,0]
             I = I[non_zeros_I]
             loc = loc[non_zeros_I]

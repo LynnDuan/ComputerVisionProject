@@ -10,6 +10,7 @@ from ssd_net import SSD
 from bbox_loss import MultiboxLoss
 from PIL import Image, ImageDraw
 import torchvision.transforms as transforms
+import os
 
 use_gpu = True
 img_dir = '../cityscapes_samples/'
@@ -79,25 +80,10 @@ for epoch_idx in range(0, max_epochs):
         print('Epoch: %d Itr: %d Conf_Loss: %f Loc_Loss: %f Loss: %f' 
                 % (epoch_idx, itr, conf_loss.item(), loc_huber_loss.item(), loss.item()))
 
-net.eval()
+net_state = net.state_dict()
+file_name = 'SSD'
+torch.save(net_state,  os.path.join('.', file_name+'.pth'))
 
-#load test image
-# img =  Image.open('../cityscapes_samples/bad-honnef/bad-honnef_000000_000000_leftImg8bit.png')
-# img1 = img.resize((300,300))
-# transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize(mean=(127,127,127),std=128.0)])
-# img1 = transform(img1)
-[tmp1, tmp2, img1] = train_dataset[0]
-[loc,conf] = net.forward(img1)
-prior =  train_dataset.get_prior_bbox()
-real_bounding_box = loc2bbox(loc,prior,center_var=0.1,size_var=0.2)
-sel_box = nms_bbox(real_bounding_box, conf, overlap_threshold=0.5, prob_threshold=0.6)
-
-draw = ImageDraw.Draw(img)
-for box in boxes:
-    box[::2] *= img.width
-    box[1::2] *= img.height
-    draw.rectangle(list(box), outline='red')
-img.show()
 
 
 '''

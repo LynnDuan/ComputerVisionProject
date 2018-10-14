@@ -21,7 +21,7 @@ def hard_negative_mining(predicted_prob, gt_label, neg_pos_ratio=3.0):
 
     # Remove the extra negative samples
     num_pos = pos_flag.sum(dim=1, keepdim=True)                     # compute the num. of positive examples
-    num_neg = neg_pos_ratio * num_pos                               # determine of neg. examples, should < neg_pos_ratio
+    num_neg = neg_pos_ratio * num_pos                               # determine of neg. examples, should < neg_pos_rationum_pos
     neg_flag = orders < num_neg                                     # retain the first 'num_neg' negative samples index.
 
     return pos_flag, neg_flag
@@ -51,18 +51,20 @@ class MultiboxLoss(nn.Module):
         with torch.no_grad():
             neg_class_prob = -F.log_softmax(confidence, dim=2)[:, :, self.neg_label_idx]      # select neg. class prob.
             pos_flag, neg_flag = hard_negative_mining(neg_class_prob, gt_class_labels, neg_pos_ratio=self.neg_pos_ratio)
-            sel_flag = pos_flag | neg_flag
-            # num_pos = pos_flag.sum(dim=1, keepdim=True).float()
+            sel_flag = pos_flag | neg_flag # pos + neg
+            # num_pos = pos_flag.sum(dim=1, keepdim=True).float() # num of matched prior boxes (label!=0)
             num_pos = pos_flag.sum().float()
 
         # Loss for the classification
         num_classes = confidence.shape[2]
         sel_conf = confidence[sel_flag]
-        conf_loss = F.cross_entropy(sel_conf.reshape(-1, num_classes), gt_class_labels[sel_flag].long()) / num_pos
+        conf_loss = F.cross_entropy(sel_conf.reshape(-1, num_classes), gt_class_labels[sel_flag].long(), size_average=False) / num_pos
  
         # Loss for the bounding box prediction
         # TODO: implementation on bounding box regression
-        loc_huber_loss = F.smooth_l1_loss(pred_loc[sel_flag], gt_bbox_loc[sel_flag]) / num_pos
+        pos_pre_loc = pred_loc[pos_flag].view(-1, 4)
+        pos_gt_bbox = gt_bbox_loc[pos_flag].view(-1, 4)
+        loc_huber_loss = F.smooth_l1_loss(pos_pre_loc, pos_gt_bbox, size_average=False) / num_pos
 
         loss = conf_loss + loc_huber_loss
 
