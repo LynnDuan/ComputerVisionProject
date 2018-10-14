@@ -52,31 +52,9 @@ class CityScapeDataset(Dataset):
             # img, boxes, labels = self.random_crop(img, boxes, labels)
 
         # crop
-        lt = sample_bboxes_corner[:,0,:]
-        rb = sample_bboxes_corner[:,1,:]
-        wh = rb - lt
-        step = [0, 682, 1024]
-        crop = []
-        crop_label = []
-        for i in step:
-            crop_lt = np.tile(np.array([i, 0]), (sample_bboxes_corner.shape[0], 1))
-            crop_rb = np.tile(np.array([i+h, h]), (sample_bboxes_corner.shape[0], 1))
-            inter_lt = np.maximum(lt, crop_lt)
-            inter_rb = np.minimum(rb, crop_rb)
-            mask = wh - (inter_rb - inter_lt)
-            crop.append(sum((mask[:,0] - mask[:,1])==0)) # num of prior box for each crop_bbox
-            crop_label.append(np.where((mask[:,0] - mask[:,1])!=0)) # label which is not in the crop_bbox
-
-        # choose crop position
-        arg = np.argmax(crop)
-        img_crop = img.crop((step[arg], 0, step[arg]+h, h))
-        delete_list = crop_label[arg][0]
-        sample_labels = np.delete(sample_labels, delete_list)
-        sample_bboxes_corner = np.delete(sample_bboxes_corner, delete_list, 0)
-        offset = np.tile(np.array([step[arg], 0]), (sample_bboxes_corner.shape[0], 2, 1))
-        sample_bboxes_corner -= offset
-
-        img_crop = img_crop.resize((self.img_size, self.img_size))
+        img, sample_bboxes_corner, sample_labels = self.crop_img(img, sample_bboxes_corner, sample_labels, img_path, h)
+        
+        img = img.resize((self.img_size, self.img_size))
 
         # Convert the bounding box from corner form (left-top, right-bottom): [(x,y), (x+w, y+h)] to
         #    center form: [(center_x, center_y, w, h)]
@@ -84,19 +62,21 @@ class CityScapeDataset(Dataset):
         rb = sample_bboxes_corner[:,1,:]
         wh = rb-lt
         c = (lt + wh/2)
-        sample_bboxes = np.stack((c[:,0]/h, c[:,1]/h, wh[:,0]/h, wh[:,1]/h), axis = 1)
+        sample_bboxes = np.stack((c[:,0]/h, c[:,1]/h, wh[:,0]/h, wh[:,1]/h), axis = 1) # crop
+        # sample_bboxes = np.stack((c[:,0]/w, c[:,1]/h, wh[:,0]/w, wh[:,1]/h), axis = 1)  # no crop
 
         # Normalize the image with self.mean and self.std
-        sample_img = (np.array(img_crop, dtype=np.float) - self.mean) / self.std
+        sample_img = (np.array(img, dtype=np.float) - self.mean) / self.std
         img_tensor = torch.from_numpy(sample_img).float()
         sample_bboxes = torch.from_numpy(np.asarray(sample_bboxes)).float()
         sample_labels = torch.from_numpy(np.asarray(sample_labels)).float()
 
         # matching prior, generate ground-truth labels and boxes
-        bbox_tensor, bbox_label_tensor, bbox_offset_tensor = match_priors(self.prior_bboxes.cpu(), sample_bboxes, sample_labels, iou_threshold=0.5)
+        bbox_tensor, bbox_label_tensor, bbox_offset_tensor = match_priors(self.prior_bboxes.cpu(), sample_bboxes, sample_labels, img_path, iou_threshold=0.5)
 
         if self.show:
-            self.show_bbox(img_crop, sample_bboxes.numpy(), bbox_tensor.numpy(), bbox_label_tensor.numpy())
+            # self.show_bbox(img, sample_bboxes.numpy(), bbox_tensor.numpy(), bbox_label_tensor.numpy())
+            self.show_bbox(img, sample_bboxes.numpy(), self.prior_bboxes.cpu().numpy(), bbox_label_tensor.numpy())
 
         # [DEBUG] check the output.
         assert isinstance(bbox_label_tensor, torch.Tensor)
@@ -117,6 +97,44 @@ class CityScapeDataset(Dataset):
             boxes[:,0,0] = xmin
             boxes[:,1,0] = xmax
         return img, boxes
+
+    def crop_img(self, img, sample_bboxes_corner, sample_labels, img_path, crop_h):
+        lt = sample_bboxes_corner[:,0,:]
+        rb = sample_bboxes_corner[:,1,:]
+        wh = rb - lt
+
+        step = [0, 682, 1024]
+        crop = []
+        crop_label = []
+        for i in step:
+            crop_lt = np.tile(np.array([i, 0]), (sample_bboxes_corner.shape[0], 1))
+            crop_rb = np.tile(np.array([i+crop_h, crop_h]), (sample_bboxes_corner.shape[0], 1))
+            inter_lt = np.maximum(lt, crop_lt)
+            inter_rb = np.minimum(rb, crop_rb)
+            mask = wh - (inter_rb - inter_lt)
+            crop.append(sum((mask[:,0] - mask[:,1])==0)) # num of prior box for each crop_bbox
+            crop_label.append(np.where((mask[:,0] - mask[:,1])!=0)) # label which is not in the crop_bbox
+
+        # choose crop position
+        arg = np.argmax(crop)
+        img_crop = img.crop((step[arg], 0, step[arg]+crop_h, crop_h))
+        delete_list = crop_label[arg][0]
+        sample_labels_c = np.delete(sample_labels, delete_list)
+        sample_bboxes_corner_c = np.delete(sample_bboxes_corner, delete_list, 0)
+        offset = np.tile(np.array([step[arg], 0]), (sample_bboxes_corner_c.shape[0], 2, 1))
+        sample_bboxes_corner_c -= offset
+
+        if len(sample_labels_c) == 0:
+            left = lt[0][0]
+            w = wh[0][0]
+            xmin = left - (crop_h - w)//2 # xmin of the crop
+            img_crop = img.crop((xmin, 0, xmin+crop_h, crop_h))
+            offset = np.tile(np.array([xmin, 0]), (1, 2, 1))
+            sample_bboxes_corner_c = np.expand_dims(sample_bboxes_corner[0], axis=0)-offset
+            sample_labels_c = np.expand_dims(sample_labels[0], axis=0)
+
+        return img_crop, sample_bboxes_corner_c, sample_labels_c
+
     
     def show_bbox(self, img, gt_bbox, prior_bbox, bbox_label):
         fig, ax = plt.subplots(1)
@@ -127,6 +145,7 @@ class CityScapeDataset(Dataset):
             ax.add_patch(rect)
 
         mask = np.where(bbox_label>0)
+        # print(sum(mask))
         for idx in mask[0]:
             cx, cy, w, h = prior_bbox[idx]*self.img_size
             rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
