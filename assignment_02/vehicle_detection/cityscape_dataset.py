@@ -72,7 +72,7 @@ class CityScapeDataset(Dataset):
         sample_labels = torch.from_numpy(np.asarray(sample_labels)).float()
 
         # matching prior, generate ground-truth labels and boxes
-        bbox_tensor, bbox_label_tensor, bbox_offset_tensor = match_priors(self.prior_bboxes.cpu(), sample_bboxes, sample_labels, img_path, iou_threshold=0.5)
+        bbox_tensor, bbox_label_tensor, bbox_offset_tensor = match_priors(self.prior_bboxes.cpu(), sample_bboxes, sample_labels, iou_threshold=0.5)
 
         if self.show:
             # self.show_bbox(img, sample_bboxes.numpy(), bbox_tensor.numpy(), bbox_label_tensor.numpy())

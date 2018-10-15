@@ -157,10 +157,14 @@ def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels:
    assert gt_labels.dim() == 1
    assert gt_labels.shape[0] == gt_bboxes.shape[0]
    assert prior_bboxes.dim() == 2
-   assert prior_bboxes.shape[1] == 4    gt_iou = torch.empty((gt_bboxes.shape[0], prior_bboxes.shape[0]))    # TODO: implement prior matching
+   assert prior_bboxes.shape[1] == 4    
+   gt_iou = torch.empty((gt_bboxes.shape[0], prior_bboxes.shape[0]))    
+   # TODO: implement prior matching
    for idx in range(0, gt_bboxes.shape[0]):
        gt_bboxes_sample = torch.unsqueeze(gt_bboxes[idx], 0)
-       gt_iou[idx] = iou(prior_bboxes, gt_bboxes_sample)    iou_value, max_obj_idx = gt_iou.max(0) # best gt for each prior box
+       gt_iou[idx] = iou(prior_bboxes, gt_bboxes_sample)    
+       iou_value, max_obj_idx = gt_iou.max(0) 
+       # best gt for each prior box
    _, max_prior_bbox_idx = gt_iou.max(1) # best prior box for each gt
    # matched_boxes = prior_bboxes
    matched_boxes = gt_bboxes[max_obj_idx]
@@ -171,11 +175,12 @@ def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels:
        matched_boxes[max_prior_bbox_idx[idx]] = gt_bboxes[idx]
        matched_labels[max_prior_bbox_idx[idx]] = gt_labels[idx]    # matched_boxes_offset = bbox2loc(torch.unsqueeze(gt_bboxes[max_obj_idx], 0), torch.unsqueeze(matched_boxes, 0))
    matched_boxes_offset = bbox2loc(torch.unsqueeze(matched_boxes, 0), torch.unsqueeze(prior_bboxes, 0))
-   matched_boxes_offset = torch.squeeze(matched_boxes_offset    # [DEBUG] Check if output is the desire shape
+   matched_boxes_offset = torch.squeeze(matched_boxes_offset)    # [DEBUG] Check if output is the desire shape
    assert matched_boxes.dim() == 2
    assert matched_boxes.shape[1] == 4
    assert matched_labels.dim() == 1
-   assert matched_labels.shape[0] == matched_boxes.shape[0]    return matched_boxes, matched_labels, matched_boxes_offset
+   assert matched_labels.shape[0] == matched_boxes.shape[0]    
+   return matched_boxes, matched_labels, matched_boxes_offset
 
 
 ''' NMS ----------------------------------------------------------------------------------------------------------------
