@@ -49,7 +49,6 @@ class CityScapeDataset(Dataset):
         # data augment
         if self.train:
             img, sample_bboxes_corner = self.random_flip(img, sample_bboxes_corner)
-            # img, boxes, labels = self.random_crop(img, boxes, labels)
 
         # crop
         img, sample_bboxes_corner, sample_labels = self.crop_img(img, sample_bboxes_corner, sample_labels, img_path, h)
@@ -63,8 +62,7 @@ class CityScapeDataset(Dataset):
         wh = rb-lt
         c = (lt + wh/2)
         sample_bboxes = np.stack((c[:,0]/h, c[:,1]/h, wh[:,0]/h, wh[:,1]/h), axis = 1) # crop
-        # sample_bboxes = np.stack((c[:,0]/w, c[:,1]/h, wh[:,0]/w, wh[:,1]/h), axis = 1)  # no crop
-
+        
         # Normalize the image with self.mean and self.std
         sample_img = (np.array(img, dtype=np.float) - self.mean) / self.std
         img_tensor = torch.from_numpy(sample_img).float()
@@ -75,7 +73,6 @@ class CityScapeDataset(Dataset):
         bbox_tensor, bbox_label_tensor, bbox_offset_tensor = match_priors(self.prior_bboxes.cpu(), sample_bboxes, sample_labels, iou_threshold=0.5)
 
         if self.show:
-            # self.show_bbox(img, sample_bboxes.numpy(), bbox_tensor.numpy(), bbox_label_tensor.numpy())
             self.show_bbox(img, sample_bboxes.numpy(), self.prior_bboxes.cpu().numpy(), bbox_label_tensor.numpy())
 
         # [DEBUG] check the output.
