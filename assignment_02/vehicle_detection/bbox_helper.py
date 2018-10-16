@@ -217,6 +217,7 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
     # implement nms for filtering out the unnecessary bounding boxes
     num_classes = bbox_confid_scores.shape[1]
     sel_bbox = []
+    class_list = []
     print('bbox size', bbox_loc.numel())
     for class_idx in range(1, num_classes):
 
@@ -234,6 +235,7 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
             i = order[0]
             print('order size', order.numel(), i, loc.numel()) 
             sel_bbox.append(loc[i,:].detach().cpu().numpy())
+            class_list.append(class_idx)
             if order.numel() == 1:
                 break
             # compute IOU
@@ -273,7 +275,7 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
             loc = loc[non_zeros_I]'''
 
 
-    return sel_bbox
+    return class_list,sel_bbox
 
 
 ''' Bounding Box Conversion --------------------------------------------------------------------------------------------

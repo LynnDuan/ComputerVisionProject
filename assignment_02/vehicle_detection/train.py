@@ -19,7 +19,7 @@ learning_rate = 0.001
 max_epochs = 200
 
 train_list = get_list(img_dir, label_dir)
-print('list',train_list)
+# print('list',train_list)
 # valid_list = train_list[-20: ]
 # train_list = train_list[0:-20]
 train_dataset = csd.CityScapeDataset(train_list, train=True, show=False)
@@ -27,7 +27,7 @@ train_data_loader = torch.utils.data.DataLoader(train_dataset,
                                                 batch_size=32,
                                                 shuffle=True,
                                                 num_workers=0)
-print('train items:', len(train_dataset))
+# print('train items:', len(train_dataset))
 
 idx, (bbox, label, img) = next(enumerate(train_data_loader))
 
