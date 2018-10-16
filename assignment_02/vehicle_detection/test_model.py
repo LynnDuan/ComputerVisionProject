@@ -70,11 +70,11 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
 
   fig, ax = plt.subplots(1)
   ax.imshow(img)
-  for bbox in sel_box:
-      cx, cy, w, h = bbox*300
-      if class_list[bbox] == 1:
+  for idx in range(len(sel_box)):
+      cx, cy, w, h = sel_box[idx]*300
+      if class_list[idx] == 1:
         rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
-      if class_list[bbox] == 2:
+      if class_list[idx] == 2:
         rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
       ax.add_patch(rect)
   plt.show()
