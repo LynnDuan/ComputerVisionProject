@@ -142,12 +142,7 @@ class CityScapeDataset(Dataset):
             ax.add_patch(rect)
 
         mask = np.where(bbox_label>0)
-<<<<<<< HEAD
         for idx in mask[0]:#default boxes
-=======
-        # print(sum(mask))
-        for idx in mask[0]:
->>>>>>> b0f454e685e06b3425ca9fab38f74a46dfdf92dd
             cx, cy, w, h = prior_bbox[idx]*self.img_size
             rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
             ax.add_patch(rect)
