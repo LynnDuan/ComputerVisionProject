@@ -56,12 +56,19 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
   real_bounding_box = loc2bbox(loc,prior,center_var=0.1,size_var=0.2)
   real_bounding_box = torch.squeeze(real_bounding_box,0)
   class_list,sel_box = nms_bbox(real_bounding_box, conf, overlap_threshold=0.5, prob_threshold=0.6)
+<<<<<<< HEAD
+=======
+  for c in class_list:
+    if c == 1:
+
+>>>>>>> b0f454e685e06b3425ca9fab38f74a46dfdf92dd
 
   # img = Image.open(os.path.join(img_dir, 'bad-honnef', 'bad-honnef_000000_000000_leftImg8bit.png'))
   img = imgs[0].permute(1,2,0).contiguous()
   true_loc = loc_targets[0,conf_targets[0,...].nonzero(),:].squeeze()
   img = Image.fromarray(np.uint8(img*128 + 127))
   # draw = ImageDraw.Draw(img)
+<<<<<<< HEAD
   sel_box = np.array(sel_box)
 
   # loc_targets = torch.squeeze(loc2bbox(loc_targets, prior)).numpy()
@@ -86,6 +93,23 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
   plt.show()
 
 
+=======
+  sel_box = np.array(sel_box[:,1:])
+  print('sel_box.shape',sel_box)
+
+  fig, ax = plt.subplots(1)
+  ax.imshow(img)
+  for idx in range(len(sel_box)):
+      cx, cy, w, h = sel_box[idx]*300
+      if class_list[idx] == 1:
+        rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
+      if class_list[idx] == 2:
+        rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
+      ax.add_patch(rect)
+  plt.show()
+
+
+>>>>>>> b0f454e685e06b3425ca9fab38f74a46dfdf92dd
   
   # print('conf',conf.shape)
   # print('loc',loc.shape)

@@ -143,55 +143,44 @@ def iou(a: torch.Tensor, b: torch.Tensor):
 
 
 def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels: torch.Tensor, iou_threshold: float):
-    """
-    Match the ground-truth boxes with the priors.
-    Note: Use this function in your ''cityscape_dataset.py', see the SSD paper page 5 for reference. (note that default box = prior boxes)
-
-    :param gt_bboxes: ground-truth bounding boxes, dim:(n_samples, 4)
-    :param gt_labels: ground-truth classification labels, negative (background) = 0, dim: (n_samples)
-    :param prior_bboxes: prior bounding boxes on different levels, dim:(num_priors, 4)
-    :param iou_threshold: matching criterion
-    :return matched_boxes: real matched bounding box, dim: (num_priors, 4)
-    :return matched_labels: real matched classification label, dim: (num_priors)
-    """
-    # [DEBUG] Check if input is the desire shape
-    assert gt_bboxes.dim() == 2
-    assert gt_bboxes.shape[1] == 4
-    assert gt_labels.dim() == 1
-    assert gt_labels.shape[0] == gt_bboxes.shape[0]
-    assert prior_bboxes.dim() == 2
-    assert prior_bboxes.shape[1] == 4
-
-    gt_iou = torch.empty((gt_bboxes.shape[0], prior_bboxes.shape[0]))
-    # print('gt_bbox_num:', gt_bboxes.shape[0])
-
-    # TODO: implement prior matching
-    for idx in range(0, gt_bboxes.shape[0]):
-        gt_bboxes_sample = torch.unsqueeze(gt_bboxes[idx], 0)
-        gt_iou[idx] = iou(prior_bboxes, gt_bboxes_sample)
-
-    iou_value, max_obj_idx = gt_iou.max(0) # belong to which obj
-    _, max_prior_bbox_idx = gt_iou.max(1) # belong to which prior box
-    matched_boxes = prior_bboxes
-    matched_labels = gt_labels[max_obj_idx]
-    matched_labels[iou_value<iou_threshold] = 0
-
-    # make sure for each gt, has at least a corresponding prior box 
-    for idx in range(1,gt_labels.shape[0]):
-        # matched_boxes[max_prior_bbox_idx[idx]] = prior_bboxes[max_prior_bbox_idx[idx]]
-        matched_labels[max_prior_bbox_idx[idx]] = gt_labels[idx]
-
-    matched_boxes_offset = bbox2loc(torch.unsqueeze(gt_bboxes[max_obj_idx], 0), torch.unsqueeze(matched_boxes, 0))
-    matched_boxes_offset = torch.squeeze(matched_boxes_offset)
-
-    # [DEBUG] Check if output is the desire shape
-    assert matched_boxes.dim() == 2
-    assert matched_boxes.shape[1] == 4
-    assert matched_labels.dim() == 1
-    assert matched_labels.shape[0] == matched_boxes.shape[0]
-
-    return matched_boxes, matched_labels, matched_boxes_offset
-
+   """
+   Match the ground-truth boxes with the priors.
+   Note: Use this function in your ''cityscape_dataset.py', see the SSD paper page 5 for reference. (note that default box = prior boxes)    :param gt_bboxes: ground-truth bounding boxes, dim:(n_samples, 4)
+   :param gt_labels: ground-truth classification labels, negative (background) = 0, dim: (n_samples)
+   :param prior_bboxes: prior bounding boxes on different levels, dim:(num_priors, 4)
+   :param iou_threshold: matching criterion
+   :return matched_boxes: real matched bounding box, dim: (num_priors, 4)
+   :return matched_labels: real matched classification label, dim: (num_priors)
+   """    # [DEBUG] Check if input is the desire shape
+   assert gt_bboxes.dim() == 2
+   assert gt_bboxes.shape[1] == 4
+   assert gt_labels.dim() == 1
+   assert gt_labels.shape[0] == gt_bboxes.shape[0]
+   assert prior_bboxes.dim() == 2
+   assert prior_bboxes.shape[1] == 4    
+   gt_iou = torch.empty((gt_bboxes.shape[0], prior_bboxes.shape[0]))    
+   # TODO: implement prior matching
+   for idx in range(0, gt_bboxes.shape[0]):
+       gt_bboxes_sample = torch.unsqueeze(gt_bboxes[idx], 0)
+       gt_iou[idx] = iou(prior_bboxes, gt_bboxes_sample)    
+       iou_value, max_obj_idx = gt_iou.max(0) 
+       # best gt for each prior box
+   _, max_prior_bbox_idx = gt_iou.max(1) # best prior box for each gt
+   # matched_boxes = prior_bboxes
+   matched_boxes = gt_bboxes[max_obj_idx]
+   matched_labels = gt_labels[max_obj_idx]
+   matched_labels[iou_value<iou_threshold] = 0    # make sure for each gt, has at least a corresponding prior box
+   for idx in range(0, gt_labels.shape[0]):
+       # matched_boxes[max_prior_bbox_idx[idx]] = prior_bboxes[max_prior_bbox_idx[idx]]
+       matched_boxes[max_prior_bbox_idx[idx]] = gt_bboxes[idx]
+       matched_labels[max_prior_bbox_idx[idx]] = gt_labels[idx]    # matched_boxes_offset = bbox2loc(torch.unsqueeze(gt_bboxes[max_obj_idx], 0), torch.unsqueeze(matched_boxes, 0))
+   matched_boxes_offset = bbox2loc(torch.unsqueeze(matched_boxes, 0), torch.unsqueeze(prior_bboxes, 0))
+   matched_boxes_offset = torch.squeeze(matched_boxes_offset)    # [DEBUG] Check if output is the desire shape
+   assert matched_boxes.dim() == 2
+   assert matched_boxes.shape[1] == 4
+   assert matched_labels.dim() == 1
+   assert matched_labels.shape[0] == matched_boxes.shape[0]    
+   return matched_boxes, matched_labels, matched_boxes_offset
 
 
 ''' NMS ----------------------------------------------------------------------------------------------------------------
@@ -227,15 +216,19 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
         ids = (scores >= prob_threshold).nonzero().squeeze()
         if ids.numel() == 0: 
             continue
-        print('ids size', class_idx, ids.numel())
         loc = bbox_loc[ids,:]
         scores = scores[ids]
         [_,order] = torch.sort(scores,0,True)
         while order.numel()> 0:
             i = order[0]
-            print('order size', order.numel(), i, loc.numel()) 
+            if loc.dim() == 1:
+                loc = torch.unsqueeze(loc, 0)
             sel_bbox.append(loc[i,:].detach().cpu().numpy())
+<<<<<<< HEAD
             class_list.append(class_idx)
+=======
+
+>>>>>>> b0f454e685e06b3425ca9fab38f74a46dfdf92dd
             if order.numel() == 1:
                 break
             # compute IOU

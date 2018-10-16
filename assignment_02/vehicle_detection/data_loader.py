@@ -13,7 +13,6 @@ format: dict {'img': img_path, 'h': float, 'w': float,
 '''
 
 def get_list(img_dir, label_dir):
-    label_dict_file = 'label_dict.csv'
     img_list = sorted(glob.glob(os.path.join(img_dir, '*/*')))
     label_list = sorted(glob.glob(os.path.join(label_dir, '*/*.json')))
     label_dict = {'bicycle': 1, 'bicyclegroup': 1, 'bus': 1, 'busgroup': 1, 'caravan': 1,
@@ -33,10 +32,13 @@ def get_list(img_dir, label_dir):
                     label_idx = label_dict[obj['label']]
                     left_top = np.amin(np.asarray(obj['polygon']), axis=0)
                     right_bottom = np.amax(np.asarray(obj['polygon']), axis=0)
-                    sample_bboxes.append([left_top, right_bottom])
-                    sample_labels.append(label_idx)
-
-            data_list.append({'img': img_list[idx], 'h': label['imgHeight'], 'w': label['imgWidth'],
+                    if not abs(right_bottom[0] - left_top[0]) > 1024:
+                        # if (abs(right_bottom[0] - left_top[0]) > 102) or (abs(right_bottom[1] - left_top[1]) > 102):
+                        sample_bboxes.append([left_top, right_bottom])
+                        sample_labels.append(label_idx)
+            
+            if sample_bboxes != []:
+                data_list.append({'img': img_list[idx], 'h': label['imgHeight'], 'w': label['imgWidth'],
                             'bboxes': np.asarray(sample_bboxes), 'labels': np.asarray(sample_labels)})
 
     return data_list
