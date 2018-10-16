@@ -34,7 +34,8 @@ file_name = 'SSD'
 test_net_state = torch.load(os.path.join('.', file_name+'.pth'))
 
 net = SSD(3)
-net.cuda()
+if use_gpu:
+  net = net.cuda()
 net.load_state_dict(test_net_state)
 itr = 0
 
@@ -54,21 +55,27 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
   # prior = prior.cuda()
   real_bounding_box = loc2bbox(loc,prior,center_var=0.1,size_var=0.2)
   real_bounding_box = torch.squeeze(real_bounding_box,0)
-  sel_box = nms_bbox(real_bounding_box, conf, overlap_threshold=0.5, prob_threshold=0.6)
+  class_list,sel_box = nms_bbox(real_bounding_box, conf, overlap_threshold=0.5, prob_threshold=0.6)
+  for c in class_list:
+    if c == 1:
+
 
   # img = Image.open(os.path.join(img_dir, 'bad-honnef', 'bad-honnef_000000_000000_leftImg8bit.png'))
   img = imgs[0].permute(1,2,0).contiguous()
   true_loc = loc_targets[0,conf_targets[0,...].nonzero(),:].squeeze()
   img = Image.fromarray(np.uint8(img*128 + 127))
   # draw = ImageDraw.Draw(img)
-  sel_box = np.array(sel_box)
+  sel_box = np.array(sel_box[:,1:])
   print('sel_box.shape',sel_box)
 
   fig, ax = plt.subplots(1)
   ax.imshow(img)
   for bbox in sel_box:
       cx, cy, w, h = bbox*300
-      rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
+      if class_list[bbox] == 1:
+        rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
+      if class_list[bbox] == 2:
+        rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
       ax.add_patch(rect)
   plt.show()
 
