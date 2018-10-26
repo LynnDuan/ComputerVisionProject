@@ -136,14 +136,13 @@ class CityScapeDataset(Dataset):
     def show_bbox(self, img, gt_bbox, prior_bbox, bbox_label):
         fig, ax = plt.subplots(1)
         ax.imshow(img)
-        for bbox in gt_bbox:
+        for bbox in gt_bbox:#ground-truth box
             cx, cy, w, h = bbox*self.img_size
             rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
             ax.add_patch(rect)
 
         mask = np.where(bbox_label>0)
-        # print(sum(mask))
-        for idx in mask[0]:
+        for idx in mask[0]:#default boxes
             cx, cy, w, h = prior_bbox[idx]*self.img_size
             rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
             ax.add_patch(rect)

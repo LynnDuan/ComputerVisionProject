@@ -224,7 +224,7 @@ def nms_bbox(bbox_loc, bbox_confid_scores, overlap_threshold=0.5, prob_threshold
             if loc.dim() == 1:
                 loc = torch.unsqueeze(loc, 0)
             sel_bbox.append(loc[i,:].detach().cpu().numpy())
-
+            class_list.append(class_idx)
             if order.numel() == 1:
                 break
             # compute IOU

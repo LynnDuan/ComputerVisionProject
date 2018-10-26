@@ -4,7 +4,7 @@ import torch.optim as optim
 import cityscape_dataset as csd
 from torch.utils.data import Dataset
 from torch.autograd import Variable
-from bbox_helper import generate_prior_bboxes, match_priors,nms_bbox,loc2bbox
+from bbox_helper import generate_prior_bboxes, match_priors,nms_bbox,loc2bbox,bbox2loc
 from data_loader import get_list
 from ssd_net import SSD
 # from bbox_loss import MultiboxLoss
@@ -56,8 +56,6 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
   real_bounding_box = loc2bbox(loc,prior,center_var=0.1,size_var=0.2)
   real_bounding_box = torch.squeeze(real_bounding_box,0)
   class_list,sel_box = nms_bbox(real_bounding_box, conf, overlap_threshold=0.5, prob_threshold=0.6)
-  for c in class_list:
-    if c == 1:
 
 
   # img = Image.open(os.path.join(img_dir, 'bad-honnef', 'bad-honnef_000000_000000_leftImg8bit.png'))
@@ -65,28 +63,25 @@ for test_batch_idx,(loc_targets, conf_targets,imgs) in enumerate(test_data_loade
   true_loc = loc_targets[0,conf_targets[0,...].nonzero(),:].squeeze()
   img = Image.fromarray(np.uint8(img*128 + 127))
   # draw = ImageDraw.Draw(img)
-  sel_box = np.array(sel_box[:,1:])
-  print('sel_box.shape',sel_box)
+  sel_box = np.array(sel_box)
+
+  # loc_targets = torch.squeeze(loc2bbox(loc_targets, prior)).numpy()
 
   fig, ax = plt.subplots(1)
   ax.imshow(img)
   for idx in range(len(sel_box)):
-      cx, cy, w, h = sel_box[idx]*300
-      if class_list[idx] == 1:
-        rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
-      if class_list[idx] == 2:
-        rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
-      ax.add_patch(rect)
+    cx, cy, w, h = sel_box[idx]*300
+    if class_list[idx] == 1:
+      rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='r', facecolor='none')
+    if class_list[idx] == 2:
+      rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='g', facecolor='none')
+    ax.add_patch(rect)
+    '''
+  # ground truth--green
+  mask = np.where(conf_targets[0]>0)
+  for idx in mask[0]:
+    cx, cy, w, h = loc_targets[idx]*300
+    rect = patches.Rectangle((cx-w/2,cy-h/2),w,h, linewidth=2, edgecolor='b', facecolor='none')
+    ax.add_patch(rect)
+    '''
   plt.show()
-
-
-  
-  # print('conf',conf.shape)
-  # print('loc',loc.shape)
-
-# draw = ImageDraw.Draw(img)
-# for box in boxes:
-#     box[::2] *= img.width
-#     box[1::2] *= img.height
-#     draw.rectangle(list(box), outline='red')
-# img.show()
