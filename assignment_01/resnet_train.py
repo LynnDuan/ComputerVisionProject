@@ -82,8 +82,6 @@ for epoch_idx in range(0, max_epochs):
                 valid_loss = criterion(valid_out.view((-1,2,7)),valid_lm)
                 valid_loss_set.append(valid_loss.item())
 
-                valid_loss_set.append(valid_loss.item())
-
                 valid_itr += 1
                 if valid_itr > 5:
                     break
