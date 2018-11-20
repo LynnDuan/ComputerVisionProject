@@ -97,13 +97,23 @@ using namespace std;
 using namespace cv;
 
 cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> next_subset){
+    int num = prev_subset.size();
+    cv::Mat A(num,9,CV_32FC1, Scalar(1));
+    for ()
     cv::Matx33d F;
-    //fill the blank
+
     return F;
 }
 bool checkinlier(cv::Point2f prev_keypoint,cv::Point2f next_keypoint,cv::Matx33d Fcandidate,double d){
+    cv::Matx33d xtf = dot(prev_keypoint.t() , Fcandidate);
+    double tmp = dot(xtf, next_keypoint);
+    if (tmp <= d){
+        return true;
+    }
+    else{
+        return false;
+    }
     
-    return false;
 }
 
 int main( int argc, char** argv )
