@@ -102,7 +102,7 @@ cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> 
     return F;
 }
 bool checkinlier(cv::Point2f prev_keypoint,cv::Point2f next_keypoint,cv::Matx33d Fcandidate,double d){
-    //fill the blank
+    
     return false;
 }
 
@@ -190,8 +190,8 @@ int main( int argc, char** argv )
         Fcandidate = Findfundamental(prev_subset,next_subset);
         // step3: Evaluate inliers, decide if we need to update the best solution
         int inliers = 0;
-        for(size_t j=0;j<prev_keypoints.size();j++){
-            if(checkinlier(prev_keypoints[j],next_keypoints[j],Fcandidate,d))
+        for(size_t j=0;j<kps_prev.size();j++){
+            if(checkinlier(kps_prev[j],kps_next[j],Fcandidate,d))
                 inliers++;
         }
         if(inliers > bestinliers)
@@ -205,7 +205,7 @@ int main( int argc, char** argv )
 
     // step4: After we finish all the iterations, use the inliers of the best model to compute Fundamental matrix again.
 
-    for(size_t j=0;j<prev_keypoints.size();j++){
+    for(size_t j=0;j<kps_prev.size();j++){
         if(checkinlier(kps_prev[j],kps_next[j],F,d))
         {
             prev_subset.push_back(kps_prev[j]);

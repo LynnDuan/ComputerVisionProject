@@ -1,4 +1,4 @@
-# Install script for directory: /home/duanlind/Downloads/SimpleVisualOdometry/simple_visual_odometry
+# Install script for directory: /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/duanlind/Downloads/SimpleVisualOdometry/simple_visual_odometry/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
