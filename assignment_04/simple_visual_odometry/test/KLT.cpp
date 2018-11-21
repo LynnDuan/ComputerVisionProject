@@ -99,8 +99,23 @@ using namespace cv;
 cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> next_subset){
     int num = prev_subset.size();
     cv::Mat A(num,9,CV_32FC1, Scalar(1));
-    for ()
-    cv::Matx33d F;
+    for (int i = 0; i < num; i++){
+        A.at<float32_t>(i,0) = prev_subset[i].x * next_subset[i].x;
+        A.at<float32_t>(i,1) = prev_subset[i].x * next_subset[i].y;
+        A.at<float32_t>(i,2) = prev_subset[i].x;
+        A.at<float32_t>(i,3) = prev_subset[i].y * next_subset[i].x;
+        A.at<float32_t>(i,4) = prev_subset[i].y * next_subset[i].y;
+        A.at<float32_t>(i,5) = prev_subset[i].y;
+        A.at<float32_t>(i,6) = next_subset[i].x;
+        A.at<float32_t>(i,7) = next_subset[i].y;
+        A.at<float32_t>(i,8) = 1.0;   
+    }
+    cv::SVD svd(A);
+    cv::Mat VT(svd.vt);
+    cv::Mat Fund(VT.row(8));
+    W.at<float32_t>(3,3) = 0.0;
+
+    cv::Matx33d F = ;
 
     return F;
 }
