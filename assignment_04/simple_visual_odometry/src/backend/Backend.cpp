@@ -132,12 +132,13 @@ void Backend::recoverCameraFromEssential(Features2D& oldFeatures,
 	vector<Point2f> points2 = newFeatures.getPoints();
 
 	//Compute essential matrix
-	E = findEssentialMat(points1, points2, K, FM_RANSAC, 0.999, 0.5, mask);
-	vector<Point2f> points1Corrected;
-	vector<Point2f> points2Corrected;
+	// E = findEssentialMat(points1, points2, K, FM_RANSAC, 0.999, 0.5, mask);
+	// vector<Point2f> points1Corrected;
+	// vector<Point2f> points2Corrected;
 
-	Mat K = Mat(this->K);
-	Mat F = K.t().inv() * E * K.inv();
+	// Mat K = Mat(this->K);
+	// Mat F = K.t().inv() * E * K.inv();
+	
 	correctMatches(F, points1, points2, points1Corrected, points2Corrected);
 
 	Mat R;

@@ -31,4 +31,8 @@ opencv2/features2d/features2d.hpp
 -
 opencv2/video/tracking.hpp
 -
+opencv2/calib3d/calib3d.hpp
+-
+opencv2/imgproc/imgproc.hpp
+-
 
