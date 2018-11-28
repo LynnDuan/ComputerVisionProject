@@ -105,11 +105,14 @@ cv::Matx33d normaliztionmatrix(cv::Mat img){
     int rows = s.height;
     int cols = s.width;
     M(0,0) = 2.0 / cols;
-    M(0,1) = 0;
-    M(0,2) = -1;
+    M(0,1) = 0.0;
+    M(0,2) = -1.0;
+    M(1,0) = 0.0;
     M(1,1) = 2.0 / rows;
-    M(1,2) = -1;
-    M(2,2) = 1;
+    M(1,2) = -1.0;
+    M(2,0) = 0.0;
+    M(2,1) = 0.0;
+    M(2,2) = 1.0;
     return M;
 
 }
@@ -118,6 +121,15 @@ cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> 
     int num = prev_subset.size();
     cv::Mat A(num,9,CV_64FC1, Scalar(1));
     for (int i = 0; i < num; i++){
+        // A.at<double>(i,0) = prev_subset[i].x * next_subset[i].x;
+        // A.at<double>(i,1) = prev_subset[i].y * next_subset[i].x;
+        // A.at<double>(i,2) = next_subset[i].x;
+        // A.at<double>(i,3) = prev_subset[i].x * next_subset[i].y;
+        // A.at<double>(i,4) = prev_subset[i].y * next_subset[i].y;
+        // A.at<double>(i,5) = next_subset[i].y;
+        // A.at<double>(i,6) = prev_subset[i].x;
+        // A.at<double>(i,7) = prev_subset[i].y;
+        // A.at<double>(i,8) = 1.0;   
         A.at<double>(i,0) = prev_subset[i].x * next_subset[i].x;
         A.at<double>(i,1) = prev_subset[i].x * next_subset[i].y;
         A.at<double>(i,2) = prev_subset[i].x;
@@ -131,8 +143,7 @@ cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> 
     // cout<<"A is"<< A <<endl;
     cv::SVD svd(A);
     cv::Mat VT(svd.vt);
-    // cout<<"VT is"<< VT.size() <<endl;
-    cv::Mat Fund(VT.col(7));
+    cv::Mat Fund(VT.row(VT.rows-1));
     
     cv::Matx33d fund;
     for(int i = 0;i < 3; i++){
@@ -150,7 +161,6 @@ cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> 
     for (int i = 0; i < 3; i++){
         w1.at<double>(i,i) = W1.at<double>(i);
     }
-    // cout<<"w10 is"<< w1 <<endl;
 
     cv::Matx33d F = (cv::Mat)(U1 * w1 * VT1);
 
@@ -160,15 +170,16 @@ bool checkinlier(cv::Point2f prev_keypoint,cv::Point2f next_keypoint,cv::Matx33d
     cv::Matx13d Prev;
     Prev(0) = prev_keypoint.x;
     Prev(1) = prev_keypoint.y;
-    Prev(2) = 1;
+    Prev(2) = 1.0;
     cv::Matx31d Next;
     Next(0) = next_keypoint.x;
     Next(1) = next_keypoint.y;
-    Next(2) = 1;
+    Next(2) = 1.0;
 
-    cv::Matx13d xtf = (cv::Mat)(Prev * Fcandidate);
-    double tmp = (xtf * Next)(0);
+    // cv::Matx13d xtf = (cv::Mat)(Prev * Fcandidate);
+    double tmp = fabs((Prev * Fcandidate * Next)(0));
     if (tmp <= d){
+        // cout << "tmp: " << tmp << endl;
         return true;
     }
     else{
@@ -176,94 +187,87 @@ bool checkinlier(cv::Point2f prev_keypoint,cv::Point2f next_keypoint,cv::Matx33d
     }    
 }
 
-// draw line
-/**
- * \brief Compute and draw the epipolar lines in two images
- *      associated to each other by a fundamental matrix
- *
- * \param title     Title of the window to display
- * \param F         Fundamental matrix
- * \param img1      First image
- * \param img2      Second image
- * \param points1   Set of points in the first image
- * \param points2   Set of points in the second image matching to the first set
- * \param inlierDistance      Points with a high distance to the epipolar lines are
- *                not displayed. If it is negative, all points are displayed
- */
-template <typename T1, typename T2>
-static void drawEpipolarLines(const std::string& title, const cv::Matx<T1,3,3> F,
-                cv::Mat& img1, cv::Mat& img2,
-                std::vector<cv::Point_<T2>> points1,
-                std::vector<cv::Point_<T2>> points2,
-                const float inlierDistance = -1)
-{
-  CV_Assert(img1.size() == img2.size() && img1.type() == img2.type());
-  cv::Mat outImg(img1.rows, img1.cols*2, CV_8UC3);
-  cv::Rect rect1(0,0, img1.cols, img1.rows);
-  cv::Rect rect2(img1.cols, 0, img1.cols, img1.rows);
-  /*
-   * Allow color drawing
-   */
-  if (img1.type() == CV_8U)
-  {
-    cv::cvtColor(img1, outImg(rect1), CV_GRAY2BGR);
-    cv::cvtColor(img2, outImg(rect2), CV_GRAY2BGR);
-  }
-  else
-  {
-    img1.copyTo(outImg(rect1));
-    img2.copyTo(outImg(rect2));
-  }
-  std::vector<cv::Vec<T2,3>> epilines1, epilines2;
-  cv::computeCorrespondEpilines(points1, 1, F, epilines1); //Index starts with 1
-  cv::computeCorrespondEpilines(points2, 2, F, epilines2);
- 
-  CV_Assert(points1.size() == points2.size() &&
-        points2.size() == epilines1.size() &&
-        epilines1.size() == epilines2.size());
- 
-  cv::RNG rng(0);
-  for(size_t i=0; i<points1.size(); i++)
-  {
-    if(inlierDistance > 0)
-    {
-      if(distancePointLine(points1[i], epilines2[i]) > inlierDistance ||
-        distancePointLine(points2[i], epilines1[i]) > inlierDistance)
-      {
-        //The point match is no inlier
-        continue;
-      }
-    }
-    /*
-     * Epipolar lines of the 1st point set are drawn in the 2nd image and vice-versa
-     */
-    cv::Scalar color(rng(256),rng(256),rng(256));
-    int temp1 = img1.cols;
-    int temp2 = img2.cols;
-    cv::line(outImg(rect2),
-      cv::Point(0,-epilines1[i][2]/epilines1[i][1]),
-      cv::Point(temp1,-(epilines1[i][2]+epilines1[i][0]*img1.cols)/epilines1[i][1]),
-      color);
-    cv::circle(outImg(rect1), points1[i], 3, color, -1, CV_AA);
- 
-    cv::line(outImg(rect1),
-      cv::Point(0,-epilines2[i][2]/epilines2[i][1]),
-      cv::Point(temp2,-(epilines2[i][2]+epilines2[i][0]*img2.cols)/epilines2[i][1]),
-      color);
-    cv::circle(outImg(rect2), points2[i], 3, color, -1, CV_AA);
-  }
-  cv::imshow(title, outImg);
-  cv::waitKey(1);
-}
- 
-template <typename T>
-static float distancePointLine(const cv::Point_<T> point, const cv::Vec<T,3>& line)
-{
-  //Line is given as a*x + b*y + c = 0
-  return std::fabs(line(0)*point.x + line(1)*point.y + line(2))
-      / std::sqrt(line(0)*line(0)+line(1)*line(1));
-}
 
+ float distancePointLine(const cv::Point2f point, const cv::Vec<double,3>& line)
+ {
+   //Line is given as a*x + b*y + c = 0
+   return std::fabs(line(0)*point.x + line(1)*point.y + line(2))
+       / std::sqrt(line(0)*line(0)+line(1)*line(1));
+ }
+
+void drawEpipolarLines(const std::string& title, const cv::Matx33d F,
+                 cv::Mat& img1, cv::Mat& img2,
+                 std::vector<cv::Point2f> points1,
+                 std::vector<cv::Point2f> points2,
+                 const float inlierDistance = -1)
+ {
+    CV_Assert(img1.size() == img2.size() && img1.type() == img2.type());
+    cv::Mat outImg1(img1.rows, img1.cols*2, CV_8UC1);
+    cv::cvtColor(img1, outImg1, CV_BGR2GRAY);
+    cv::Mat outImg2(img1.rows, img1.cols*2, CV_8UC1);
+    cv::cvtColor(img2, outImg2, CV_BGR2GRAY);
+    // cv::Rect rect1(0,0, img1.cols, img1.rows);
+    // cv::Rect rect2(img1.cols, 0, img1.cols, img1.rows);
+    // /*
+    // * Allow color drawing
+    // */
+    // if (img1.type() == CV_8U)
+    // {
+    //  cv::cvtColor(img1, outImg(rect1), CV_GRAY2BGR);
+    //  cv::cvtColor(img2, outImg(rect2), CV_GRAY2BGR);
+    // }
+    // else
+    // {
+    //  img1.copyTo(outImg(rect1));
+    //  img2.copyTo(outImg(rect2));
+    // }
+    std::vector<cv::Vec3f> epilines1, epilines2;
+    cv::computeCorrespondEpilines(points1, 1, F, epilines1); //Index starts with 1
+    cv::computeCorrespondEpilines(points2, 2, F, epilines2);
+
+    // CV_Assert(points1.size() == points2.size() &&
+    //      points2.size() == epilines1.size() &&
+    //      epilines1.size() == epilines2.size());
+
+    // cv::RNG rng(0);
+    for(size_t i=0; i<points1.size(); i++){
+         // if(inlierDistance > 0)
+         // {
+         //   if(distancePointLine(points1[i], epilines2[i]) > inlierDistance ||
+         //     distancePointLine(points2[i], epilines1[i]) > inlierDistance)
+         //   {
+         //     //The point match is no inlier
+         //     continue;
+         //   }
+         // }
+         /*
+          * Epipolar lines of the 1st point set are drawn in the 2nd image and vice-versa
+          */
+         // cv::Scalar color(rng(256),rng(256),rng(256));
+        cv::Scalar color(255);
+        int temp1 = img1.cols;
+        int temp2 = img2.cols;
+        cv::line(outImg1,
+        cv::Point(0,-epilines1[i][2]/epilines1[i][1]),
+        cv::Point(temp1,-(epilines1[i][2]+epilines1[i][0]*temp1)/epilines1[i][1]),
+        color);
+        cv::circle(outImg1, points1[i], 3, color, -1, CV_AA);
+
+        cv::line(outImg2,
+        cv::Point(0,-epilines2[i][2]/epilines2[i][1]),
+        cv::Point(temp2,-(epilines2[i][2]+epilines2[i][0]*temp2)/epilines2[i][1]),
+        color);
+        cv::circle(outImg2, points2[i], 3, color, -1, CV_AA);
+    }
+
+    Mat HImg;
+    hconcat(outImg1, outImg2, HImg);
+
+    namedWindow(title, WINDOW_AUTOSIZE );
+    cv::imshow(title, HImg);
+    cv::waitKey(0);
+ }
+ 
 
 
 int main( int argc, char** argv )
@@ -327,18 +331,12 @@ int main( int argc, char** argv )
         kps_next[i].y = kps_next[i].y * Norm(1,1) - 1;
     }
 
-
-
-
-
-    // p Probability that at least one valid set of inliers is chosen
-    // d Tolerated distance from the model for inliers
-    // e Assumed outlier percent in data set.
-    double p = 0.99;
-    double d = 1.5f;
+    double p = 0.9;
+    double d = 0.05f;
     double e = 0.2;
 
-    int niter = static_cast<int>(std::ceil(std::log(1.0-p)/std::log(1.0-std::pow(1.0-e,8))));
+    // int niter = static_cast<int>(std::ceil(std::log(1.0-p)/std::log(1.0-std::pow(1.0-e,8))));
+    int niter = 500;
     Mat Fundamental;
     cv::Matx33d F,Fcandidate;
     int bestinliers = -1;
@@ -346,6 +344,7 @@ int main( int argc, char** argv )
     int matches = kps_prev.size();
     prev_subset.clear();
     next_subset.clear();
+    cout << "size: " << KPS_prev.size() << endl;
 
     for(int i=0;i<niter;i++){
         // step1: randomly sample 8 matches for 8pt algorithm
@@ -362,7 +361,7 @@ int main( int argc, char** argv )
         }
         // step2: perform 8pt algorithm, get candidate F
         Fcandidate = Findfundamental(prev_subset,next_subset);
-
+        // Fcandidate = (cv::Matx33d)cv::findFundamentalMat(prev_subset,next_subset, CV_FM_8POINT);
         // step3: Evaluate inliers, decide if we need to update the best solution
         int inliers = 0;
         for(size_t j=0;j<kps_prev.size();j++){
@@ -373,6 +372,7 @@ int main( int argc, char** argv )
         {
             F = Fcandidate;
             bestinliers = inliers;
+            cout << "bestinliers: " << bestinliers << endl;
         }
         prev_subset.clear();
         next_subset.clear();
@@ -389,12 +389,27 @@ int main( int argc, char** argv )
 
     }
     F = Findfundamental(prev_subset,next_subset);
+    // F = (cv::Matx33d)cv::findFundamentalMat(prev_subset,next_subset, CV_FM_8POINT);
     F = Norm.t() * F * Norm;
 
     cout<<"Fundamental matrix is \n"<<F<<endl;
 
+    // Matx13d prev;
+    // Matx31d next;
+    // for (int i = 0; i < KPS_prev.size(); i++){
+    //     prev(0) = KPS_prev[i].x;
+    //     prev(1) = KPS_prev[i].y;
+    //     prev(2) = 1.0;
+    //     next(0) = KPS_next[i].x;
+    //     next(1) = KPS_next[i].y;
+    //     next(2) = 1.0;
+    //     cout << prev * F * next << endl;
+    // }
 
-    drawEpipolarLines<float, double>("epipolar line", F,img_1, img_2, KPS_prev, KPS_next, -1);
+
+
+    drawEpipolarLines("epipolar line", F, img_1, img_2, KPS_prev, KPS_next, -1);
+
     return 0;
 }
 

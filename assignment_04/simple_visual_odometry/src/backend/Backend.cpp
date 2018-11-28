@@ -8,6 +8,8 @@ Backend::Backend()
 	state = Initial;
 }
 
+
+
 Eigen::Affine3d Backend::computePose(Features2D& trackedFeatures,
 			Features2D& newFeatures)
 {
@@ -51,6 +53,7 @@ Eigen::Affine3d Backend::computePose(Features2D& trackedFeatures,
 		return T_WC;
 
 }
+
 
 void Backend::lostExceptionHandler()
 {
