@@ -218,7 +218,7 @@ int Camerapose(cv::Matx33d E, cv::Matx34d& P1, cv::Matx34d& P2, cv::Matx34d& P3,
     return 0;
 }
 
-int checkCamerapose(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev,vector<cv::Point2f> KPS_next){
+int triangulation(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev,vector<cv::Point2f> KPS_next){
     Matx14d P11,P12,P13;
     Matx14d p1,p2,p3;
     int count = 0;
@@ -471,7 +471,7 @@ int main( int argc, char** argv )
     int num = 0;
     cv::Matx34d BestP;
     for (int i = 0; i < 4; i++){
-        int num_tmp  = checkCamerapose(cameraP, K * P[i], KPS_prev,KPS_next);
+        int num_tmp  = triangulation(cameraP, K * P[i], KPS_prev,KPS_next);
         if (num_tmp > num){
             BestP = P[i];
             num = num_tmp;
