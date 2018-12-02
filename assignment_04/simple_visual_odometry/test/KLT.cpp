@@ -514,19 +514,24 @@ int main( int argc, char** argv )
     }
 
     // check if R and t are correct
-    cv::Matx34d Ptmp = K.inv() * BestP;
-    cv::Matx33d R_self;
-    for (int i = 0; i < 3; i++){
-        for (int j = 0; j < 3; j++){
-            R_self(i,j) = Ptmp(i,j);
-        }
-    }
-    cv::Matx31d t_self;
-    for (int i = 0; i < 3; i++){
-        t_self(i) = Ptmp(i,3);
-    } 
+    cv::Matx33d cameraK; // Output 3x3 camera matrix K.
+    cv::Matx33d R_self; // Output 3x3 external rotation matrix R.
+    cv::Matx31d t_self; //Output 4x1 translation vector T.
+    cv::decomposeProjectionMatrix(BestP, cameraK, R_self, t_self);
+    // cv::Matx34d Ptmp = K.inv() * BestP;
+    // cv::Matx33d R_self;
+    // for (int i = 0; i < 3; i++){
+    //     for (int j = 0; j < 3; j++){
+    //         R_self(i,j) = Ptmp(i,j);
+    //     }
+    // }
+    // cv::Matx31d t_self;
+    // for (int i = 0; i < 3; i++){
+    //     t_self(i) = Ptmp(i,3);
+    // } 
     cout << "R_self" << R_self << endl;
     cout << "t_self" << t_self << endl;
+    
     cv::Matx33d R; cv::Matx31d t;
     cv::recoverPose(Essential, KPS_prev, KPS_next, K , R, t);
     cout << "check R"  << R << endl;
