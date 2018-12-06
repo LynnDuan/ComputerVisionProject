@@ -200,7 +200,7 @@ cv::Matx33d Findessential(cv::Matx33d F){
     return E;
 }
 
-int Camerapose(cv::Matx33d E, cv::Matx34d& P1, cv::Matx34d& P2, cv::Matx34d& P3, cv::Matx34d& P4){
+int relativepose(cv::Matx33d E, cv::Matx34d& P1, cv::Matx34d& P2, cv::Matx34d& P3, cv::Matx34d& P4){
     cv::SVD svd(E);
     cv::Mat U(svd.u);
     cv::Mat W(svd.w);
@@ -261,8 +261,7 @@ int triangulation(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev, v
         P4_1(3,j) = 0.0;
         P4_2(3,j) = 0.0;
     }
-    P4_1(3,3) = 1.0; P4_2(3,3) = 1.0;
-    cout << "cameraP" << P4_1 << endl;
+    P4_1(3,3) = 1.0; P4_2(3,3) = 1.0;s
 
     for (int i = 0; i < KPS_prev.size(); i++){
         Matx44d A;
@@ -381,7 +380,7 @@ void drawEpipolarLines(const std::string& title, const cv::Matx33d F,
     cv::Matx33d Essential = Findessential(F);
 
     cv::Matx34d P[4]; // initialize 4 camera pose
-    Camerapose(Essential, P[0], P[1], P[2], P[3]);
+    relativepose(Essential, P[0], P[1], P[2], P[3]);
     int num = 0;
     cv::Matx34d BestP;
     for (int i = 0; i < 4; i++){
@@ -456,7 +455,7 @@ int main( int argc, char** argv )
     cout<<"LK Flow use time："<<time_used.count()<<" seconds."<<endl;
 
     vector<cv::Point2f> kps_prev,kps_next;
-    vector<cv::Point2f> KPS_prev,KPS_next; // Draw a figure to show epipolar constraint
+    // vector<cv::Point2f> KPS_prev,KPS_next; // Draw a figure to show epipolar constraint
     kps_prev.clear();
     kps_next.clear();
     for(size_t i=0;i<prev_keypoints.size();i++)
@@ -465,8 +464,8 @@ int main( int argc, char** argv )
         {
             kps_prev.push_back(prev_keypoints[i]);
             kps_next.push_back(next_keypoints[i]);
-            KPS_prev.push_back(prev_keypoints[i]);
-            KPS_next.push_back(next_keypoints[i]);
+            // KPS_prev.push_back(prev_keypoints[i]);
+            // KPS_next.push_back(next_keypoints[i]);
         }
     }
 
@@ -483,7 +482,7 @@ int main( int argc, char** argv )
     int matches = kps_prev.size();
     prev_subset.clear();
     next_subset.clear();
-    cout << "size: " << KPS_prev.size() << endl;
+    // cout << "size: " << KPS_prev.size() << endl;
 
     for(int i=0;i<niter;i++){
         // step1: randomly sample 8 matches for 8pt algorithm
@@ -548,7 +547,7 @@ int main( int argc, char** argv )
 
     cv::Matx33d Essential = Findessential(F);
     cv::Matx34d P[4]; // initialize 4 camera pose
-    Camerapose(Essential, P[0], P[1], P[2], P[3]);
+    relativepose(Essential, P[0], P[1], P[2], P[3]);
 
     // compute camera P1
     cv::Matx34d cameraP;
@@ -565,7 +564,7 @@ int main( int argc, char** argv )
     int num = 0;
     cv::Matx34d BestP;
     for (int i = 0; i < 4; i++){
-        int num_tmp  = triangulation(K * cameraP, K * P[i], KPS_prev,KPS_next);
+        int num_tmp  = triangulation(K * cameraP, K * P[i], kps_prev,kps_next);
         if (num_tmp > num){
             BestP = P[i];
             num = num_tmp;
@@ -587,9 +586,27 @@ int main( int argc, char** argv )
     } 
     cout << "R_self" << R_self << endl;
     cout << "t_self" << t_self << endl;
+
+    // Locations of triangulated 3d map points
+    cv::Matx41d X_prev, X_next;
+    for (int i = 0; i < 2; i++){
+        cv::Matx31d x_prev;
+        cv::Matx31d x_next;
+        x_prev(0) =  kps_prev[i].x; x_prev(1) =  kps_prev[i].y; x_prev(2) =  1.0;
+        x_next(0) =  kps_prev[i].x; x_next(1) =  kps_prev[i].y; x_next(2) =  1.0;
+        X_prev = BestP.inv() * x_prev;
+        X_prev = X_prev / X_prev[3];
+        X_next = BestP.inv() * x_next;
+        X_next = X_next / X_next[3];
+        cout << "x_prev" << x_prev << endl;
+        cout << "X_prev" << X_prev << endl;
+        cout << "x_next" << x_next << endl;
+        cout << "X_next" << X_next << endl;
+        
+    }
     
     // draw epoploarlines
-    drawEpipolarLines("epipolar line", F, img_1, img_2, KPS_prev, KPS_next, -1);
+    drawEpipolarLines("epipolar line", F, img_1, img_2, kps_prev, kps_next, -1);
     
     testresult();
     return 0;
