@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry
+CMAKE_SOURCE_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build
+CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/featuredetector.dir/depend.make
@@ -57,7 +57,67 @@ include CMakeFiles/featuredetector.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/featuredetector.dir/flags.make
 
-CMakeFiles/featuredetector.dir/requires:
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o: CMakeFiles/featuredetector.dir/flags.make
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o: ../test/featuredetector.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o"
+	g++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o -c /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/test/featuredetector.cpp
+
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/featuredetector.dir/test/featuredetector.cpp.i"
+	g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/test/featuredetector.cpp > CMakeFiles/featuredetector.dir/test/featuredetector.cpp.i
+
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/featuredetector.dir/test/featuredetector.cpp.s"
+	g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/test/featuredetector.cpp -o CMakeFiles/featuredetector.dir/test/featuredetector.cpp.s
+
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.requires:
+
+.PHONY : CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.requires
+
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.provides: CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.requires
+	$(MAKE) -f CMakeFiles/featuredetector.dir/build.make CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.provides.build
+.PHONY : CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.provides
+
+CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.provides.build: CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o
+
+
+# Object files for target featuredetector
+featuredetector_OBJECTS = \
+"CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o"
+
+# External object files for target featuredetector
+featuredetector_EXTERNAL_OBJECTS =
+
+featuredetector: CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o
+featuredetector: CMakeFiles/featuredetector.dir/build.make
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_videostab.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_ts.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_superres.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_ocl.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_gpu.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_contrib.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_photo.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_legacy.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_video.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_objdetect.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_ml.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_calib3d.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_features2d.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_highgui.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_flann.so.2.4.9
+featuredetector: /usr/lib/x86_64-linux-gnu/libopencv_core.so.2.4.9
+featuredetector: CMakeFiles/featuredetector.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable featuredetector"
+	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/featuredetector.dir/link.txt --verbose=$(VERBOSE)
+
+# Rule to build all files generated by this target.
+CMakeFiles/featuredetector.dir/build: featuredetector
+
+.PHONY : CMakeFiles/featuredetector.dir/build
+
+CMakeFiles/featuredetector.dir/requires: CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o.requires
 
 .PHONY : CMakeFiles/featuredetector.dir/requires
 
@@ -66,6 +126,6 @@ CMakeFiles/featuredetector.dir/clean:
 .PHONY : CMakeFiles/featuredetector.dir/clean
 
 CMakeFiles/featuredetector.dir/depend:
-	cd /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles/featuredetector.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles/featuredetector.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/featuredetector.dir/depend
 

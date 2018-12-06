@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry
+CMAKE_SOURCE_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build
+CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build
 
 #=============================================================================
 # Target rules for target CMakeFiles/featuredetector.dir
@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignm
 CMakeFiles/featuredetector.dir/all:
 	$(MAKE) -f CMakeFiles/featuredetector.dir/build.make CMakeFiles/featuredetector.dir/depend
 	$(MAKE) -f CMakeFiles/featuredetector.dir/build.make CMakeFiles/featuredetector.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles --progress-num= "Built target featuredetector"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles --progress-num=1,2 "Built target featuredetector"
 .PHONY : CMakeFiles/featuredetector.dir/all
 
 # Include target in all.
@@ -76,9 +76,9 @@ all: CMakeFiles/featuredetector.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/featuredetector.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/featuredetector.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles 0
 .PHONY : CMakeFiles/featuredetector.dir/rule
 
 # Convenience name for target.
@@ -103,7 +103,7 @@ clean: CMakeFiles/featuredetector.dir/clean
 CMakeFiles/klt.dir/all:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/depend
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles --progress-num= "Built target klt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles --progress-num=3,4 "Built target klt"
 .PHONY : CMakeFiles/klt.dir/all
 
 # Include target in all.
@@ -113,9 +113,9 @@ all: CMakeFiles/klt.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/klt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/klt.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles 0
 .PHONY : CMakeFiles/klt.dir/rule
 
 # Convenience name for target.

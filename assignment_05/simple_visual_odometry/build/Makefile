@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry
+CMAKE_SOURCE_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build
+CMAKE_BINARY_DIR = /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_05/simple_visual_odometry/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -136,6 +136,60 @@ klt/fast:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/build
 .PHONY : klt/fast
 
+test/KLT.o: test/KLT.cpp.o
+
+.PHONY : test/KLT.o
+
+# target to build an object file
+test/KLT.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/test/KLT.cpp.o
+.PHONY : test/KLT.cpp.o
+
+test/KLT.i: test/KLT.cpp.i
+
+.PHONY : test/KLT.i
+
+# target to preprocess a source file
+test/KLT.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/test/KLT.cpp.i
+.PHONY : test/KLT.cpp.i
+
+test/KLT.s: test/KLT.cpp.s
+
+.PHONY : test/KLT.s
+
+# target to generate assembly for a file
+test/KLT.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/test/KLT.cpp.s
+.PHONY : test/KLT.cpp.s
+
+test/featuredetector.o: test/featuredetector.cpp.o
+
+.PHONY : test/featuredetector.o
+
+# target to build an object file
+test/featuredetector.cpp.o:
+	$(MAKE) -f CMakeFiles/featuredetector.dir/build.make CMakeFiles/featuredetector.dir/test/featuredetector.cpp.o
+.PHONY : test/featuredetector.cpp.o
+
+test/featuredetector.i: test/featuredetector.cpp.i
+
+.PHONY : test/featuredetector.i
+
+# target to preprocess a source file
+test/featuredetector.cpp.i:
+	$(MAKE) -f CMakeFiles/featuredetector.dir/build.make CMakeFiles/featuredetector.dir/test/featuredetector.cpp.i
+.PHONY : test/featuredetector.cpp.i
+
+test/featuredetector.s: test/featuredetector.cpp.s
+
+.PHONY : test/featuredetector.s
+
+# target to generate assembly for a file
+test/featuredetector.cpp.s:
+	$(MAKE) -f CMakeFiles/featuredetector.dir/build.make CMakeFiles/featuredetector.dir/test/featuredetector.cpp.s
+.PHONY : test/featuredetector.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -146,6 +200,12 @@ help:
 	@echo "... featuredetector"
 	@echo "... rebuild_cache"
 	@echo "... klt"
+	@echo "... test/KLT.o"
+	@echo "... test/KLT.i"
+	@echo "... test/KLT.s"
+	@echo "... test/featuredetector.o"
+	@echo "... test/featuredetector.i"
+	@echo "... test/featuredetector.s"
 .PHONY : help
 
 

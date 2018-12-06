@@ -99,43 +99,27 @@ using namespace cv;
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-// cv::Matx33d normaliztionmatrix(cv::Mat img){
-//     Matx33d M;
-//     cv::Size s = img.size();
-//     int rows = s.height;
-//     int cols = s.width;
-//     M(0,0) = 2.0 / cols;
-//     M(0,1) = 0.0;
-//     M(0,2) = -1.0;
-//     M(1,0) = 0.0;
-//     M(1,1) = 2.0 / rows;
-//     M(1,2) = -1.0;
-//     M(2,0) = 0.0;
-//     M(2,1) = 0.0;
-//     M(2,2) = 1.0;
-//     return M;
-// }
-
-cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> next_subset, cv::Mat img){
+cv::Matx33d Findfundamental(vector<cv::Point2f> prev_subset,vector<cv::Point2f> next_subset){
     Matx33d Norm;
-    cv::Size s = img.size();
-    int rows = s.height;
-    int cols = s.width;
-    Norm(0,0) = 2.0 / cols;
+    // cv::Size s = img.size();
+    int rows = 500;
+    int cols = 700;
+    Norm(0,0) = 3.0 / cols;
     Norm(0,1) = 0.0;
-    Norm(0,2) = -1.0;
+    Norm(0,2) = -1.1;
     Norm(1,0) = 0.0;
-    Norm(1,1) = 2.0 / rows;
-    Norm(1,2) = -1.0;
+    Norm(1,1) = 3.0 / rows;
+    Norm(1,2) = -1.1;
     Norm(2,0) = 0.0;
     Norm(2,1) = 0.0;
     Norm(2,2) = 1.0;
 
+
     for (size_t i = 0; i < prev_subset.size(); i++){
-        prev_subset[i].x = prev_subset[i].x * Norm(0,0) - 1;
-        prev_subset[i].y = prev_subset[i].y * Norm(1,1) - 1;
-        next_subset[i].x = next_subset[i].x * Norm(0,0) - 1;
-        next_subset[i].y = next_subset[i].y * Norm(1,1) - 1;
+        prev_subset[i].x = prev_subset[i].x * Norm(0,0) - 1.1;
+        prev_subset[i].y = prev_subset[i].y * Norm(1,1) - 1.1;
+        next_subset[i].x = next_subset[i].x * Norm(0,0) - 1.1;
+        next_subset[i].y = next_subset[i].y * Norm(1,1) - 1.1;
     }
 
     int num = prev_subset.size();
@@ -191,7 +175,6 @@ bool checkinlier(cv::Point2f prev_keypoint,cv::Point2f next_keypoint,cv::Matx33d
 
     double tmp = fabs((Prev * Fcandidate * Next)(0));
     if (tmp <= d){
-        // cout << "tmp: " << tmp << endl;
         return true;
     }
     else{
@@ -206,6 +189,12 @@ cv::Matx33d Findessential(cv::Matx33d F){
     K(2,2) = 1.0;
     K(0,2) = 318.643040;
     K(1,2) = 255.313989;
+    
+    //For test
+    // K(0,0) = 1.0;
+    // K(1,1) = 1.0;
+    // K(2,2) = 1.0;
+
     cv::Matx33d E;
     E = K.t() * F * K;
     return E;
@@ -216,7 +205,7 @@ int Camerapose(cv::Matx33d E, cv::Matx34d& P1, cv::Matx34d& P2, cv::Matx34d& P3,
     cv::Mat U(svd.u);
     cv::Mat W(svd.w);
     cv::Mat VT(svd.vt);
-    cv::Mat Wtmp(3,3,CV_64FC1, Scalar(1));
+    cv::Mat Wtmp(3,3,CV_64FC1, Scalar(0));
     Wtmp.at<double>(0,1) = -1.0;
     Wtmp.at<double>(1,0) = 1.0;
     Wtmp.at<double>(2,2) = 1.0;
@@ -248,7 +237,7 @@ int Camerapose(cv::Matx33d E, cv::Matx34d& P1, cv::Matx34d& P2, cv::Matx34d& P3,
     return 0;
 }
 
-int triangulation(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev,vector<cv::Point2f> KPS_next){
+int triangulation(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev, vector<cv::Point2f> KPS_next){
     Matx14d P11,P12,P13;
     Matx14d p1,p2,p3;
     int count = 0;
@@ -267,12 +256,13 @@ int triangulation(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev,ve
             P4_2(row,col) = P(row,col);
         }
     }
+
     for (int j = 0; j < 3; j++){
         P4_1(3,j) = 0.0;
         P4_2(3,j) = 0.0;
     }
     P4_1(3,3) = 1.0; P4_2(3,3) = 1.0;
-
+    cout << "cameraP" << P4_1 << endl;
 
     for (int i = 0; i < KPS_prev.size(); i++){
         Matx44d A;
@@ -292,10 +282,8 @@ int triangulation(cv::Matx34d P1, cv::Matx34d P, vector<cv::Point2f> KPS_prev,ve
         Matx41d X = (cv::Mat)(Xtmp.t());
         Matx41d X1 = P4_1 * X;
         X1(2) = X1(2)/X1(3);
-        // cout << "X1" << X1 << endl;
         Matx41d X2 = P4_2 * X;
         X2(2) = X2(2)/X2(3);
-        // cout << "X2" << X2 << endl;
         if (X1(2) > 0 && X2(2) >0){
             count++;
         }
@@ -354,12 +342,84 @@ void drawEpipolarLines(const std::string& title, const cv::Matx33d F,
     cv::imshow(title, HImg);
     cv::waitKey(0);
  }
+
+ void testresult(){
+    cv::Mat points3D(1, 16, CV_64FC4);
+    cv::randu(points3D, cv::Scalar(-5.0, -5.0, 1.0, 1.0), cv::Scalar(5.0, 5.0, 10.0, 1.0 ));
+
+
+    //Compute 2 camera matrices
+    cv::Matx34d C1 = cv::Matx34d::eye();
+    cv::Matx34d C2 = cv::Matx34d::eye();
+    cv::Mat K = cv::Mat::eye(3, 3, CV_64F);
+    C2(2, 3) = 1;
+
+    //Compute points projection
+    vector<cv::Point2f> points1;
+    vector<cv::Point2f> points2;
+
+    for(size_t i = 0; i < points3D.cols; i++)
+    {
+        cv::Vec3d hpt1 = C1*points3D.at<cv::Vec4d>(0, i);
+        cv::Vec3d hpt2 = C2*points3D.at<cv::Vec4d>(0, i);
+
+        hpt1 /= hpt1[2];
+        hpt2 /= hpt2[2];
+
+        cv::Point2f p1(hpt1[0], hpt1[1]);
+        cv::Point2f p2(hpt2[0], hpt2[1]);
+
+        points1.push_back(p1);
+        points2.push_back(p2);
+    }
+    cv::Matx34d cameraP;
+    cameraP(0,0) = 1.0;
+    cameraP(1,1) = 1.0;
+    cameraP(2,2) = 1.0;
+    cout << "cameraP" << cameraP << endl;
+    Matx33d F = Findfundamental(points1,points2);
+    cv::Matx33d Essential = Findessential(F);
+
+    cv::Matx34d P[4]; // initialize 4 camera pose
+    Camerapose(Essential, P[0], P[1], P[2], P[3]);
+    int num = 0;
+    cv::Matx34d BestP;
+    for (int i = 0; i < 4; i++){
+        int num_tmp  = triangulation(cameraP, P[i], points1, points2);
+        if (num_tmp > num){
+            BestP = P[i];
+            num = num_tmp;
+        }   
+    }
+
+    // check if R and t are correct
+    cv::Matx33d cameraK; // Output 3x3 camera matrix K.
+    cv::Matx33d R_self; // Output 3x3 external rotation matrix R.
+    cv::Matx31d t_self; //Output 4x1 translation vector T.
+    cv::Matx34d Ptmp = BestP;
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            R_self(i,j) = Ptmp(i,j);
+        }
+    }
+    for (int i = 0; i < 3; i++){
+        t_self(i) = Ptmp(i,3);
+    } 
+    cout << "R_self" << R_self << endl;
+    cout << "t_self" << t_self << endl;
+
+
+    cout << "C2_original" << C2 << endl;
+
+
+
+ }
  
 
 
 int main( int argc, char** argv )
 {
-    int method = 2;// 1-self;2-opencv;
+    int method = 1;// 1-self;2-opencv;
     srand ( time(NULL) );
 
     if ( argc != 3 )
@@ -440,7 +500,7 @@ int main( int argc, char** argv )
         }
         // step2: perform 8pt algorithm, get candidate F
         if (method == 1){
-            Fcandidate = Findfundamental(prev_subset,next_subset,img_1);
+            Fcandidate = Findfundamental(prev_subset,next_subset);
         }
         else{
             Fcandidate = (cv::Matx33d)cv::findFundamentalMat(prev_subset,next_subset, CV_FM_8POINT);
@@ -473,7 +533,7 @@ int main( int argc, char** argv )
 
     }
     if (method == 1){
-        F = Findfundamental(prev_subset,next_subset,img_1);
+        F = Findfundamental(prev_subset,next_subset);
     }
     else{
         F = (cv::Matx33d)cv::findFundamentalMat(prev_subset,next_subset, CV_FM_8POINT);
@@ -501,12 +561,11 @@ int main( int argc, char** argv )
     K(2,2) = 1.0;
     K(0,2) = 318.643040;
     K(1,2) = 255.313989;
-    cameraP = K * cameraP;
 
     int num = 0;
     cv::Matx34d BestP;
     for (int i = 0; i < 4; i++){
-        int num_tmp  = triangulation(cameraP, K * P[i], KPS_prev,KPS_next);
+        int num_tmp  = triangulation(K * cameraP, K * P[i], KPS_prev,KPS_next);
         if (num_tmp > num){
             BestP = P[i];
             num = num_tmp;
@@ -514,33 +573,25 @@ int main( int argc, char** argv )
     }
 
     // check if R and t are correct
-    cv::Matx33d cameraK; // Output 3x3 camera matrix K.
     cv::Matx33d R_self; // Output 3x3 external rotation matrix R.
     cv::Matx31d t_self; //Output 4x1 translation vector T.
-    cv::decomposeProjectionMatrix(BestP, cameraK, R_self, t_self);
-    // cv::Matx34d Ptmp = K.inv() * BestP;
-    // cv::Matx33d R_self;
-    // for (int i = 0; i < 3; i++){
-    //     for (int j = 0; j < 3; j++){
-    //         R_self(i,j) = Ptmp(i,j);
-    //     }
-    // }
-    // cv::Matx31d t_self;
-    // for (int i = 0; i < 3; i++){
-    //     t_self(i) = Ptmp(i,3);
-    // } 
+
+    cv::Matx34d Ptmp = K.inv() * BestP;
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            R_self(i,j) = Ptmp(i,j);
+        }
+    }
+    for (int i = 0; i < 3; i++){
+        t_self(i) = Ptmp(i,3);
+    } 
     cout << "R_self" << R_self << endl;
     cout << "t_self" << t_self << endl;
     
-    cv::Matx33d R; cv::Matx31d t;
-    cv::recoverPose(Essential, KPS_prev, KPS_next, K , R, t);
-    cout << "check R"  << R << endl;
-    cout << "check t" << t << endl;
-    
     // draw epoploarlines
     drawEpipolarLines("epipolar line", F, img_1, img_2, KPS_prev, KPS_next, -1);
+    
+    testresult();
     return 0;
 }
-
-
 
