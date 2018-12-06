@@ -587,7 +587,7 @@ int main( int argc, char** argv )
     cout << "R_self" << R_self << endl;
     cout << "t_self" << t_self << endl;
 
-    // Locations of triangulated 3d map points
+    Locations of triangulated 3d map points
     cv::Matx41d X_prev, X_next;
     for (int i = 0; i < 2; i++){
         cv::Matx31d x_prev;
@@ -595,9 +595,10 @@ int main( int argc, char** argv )
         x_prev(0) =  kps_prev[i].x; x_prev(1) =  kps_prev[i].y; x_prev(2) =  1.0;
         x_next(0) =  kps_prev[i].x; x_next(1) =  kps_prev[i].y; x_next(2) =  1.0;
         X_prev = BestP.inv() * x_prev;
-        X_prev = X_prev / X_prev[3];
+        X_prev = X_prev / (double)X_prev(3);
         X_next = BestP.inv() * x_next;
-        X_next = X_next / X_next[3];
+        X_next = X_next / (double)X_next(3);
+        cout << X_next.size() << endl;
         cout << "x_prev" << x_prev << endl;
         cout << "X_prev" << X_prev << endl;
         cout << "x_next" << x_next << endl;

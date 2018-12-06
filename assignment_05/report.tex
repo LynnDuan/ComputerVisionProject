@@ -47,7 +47,7 @@
 	
 	\section{Implementation} 
 	\subsection{checkinliner} 
-	For the point $x_{1*3}$ in the previous images , and the relevant point $x_{1*3}^{'}$ in the next image,  if $x^{T} F x^{'} \leq  d$, then return true.
+	For the point $x$ in the previous images , and the relevant point $x^{'}$ in the next image,  if $x^{T} F x^{'} \leq  d$, then return true.
 	\subsection{Findfundmental}
 	Firstly, normalized the previous subset and the next subset. Then use the normalized subsets to form a matrix $A$, which $$A = \begin{pmatrix}
 	x_{1}^{'}x_{1} & x_{1}^{'}y_{1} & x_{1}^{'} & y_{1}^{'}x_{1} & y_{1}^{'}y_{1} & y_{1}^{'} & x_1 & y_1 & 1 \\
@@ -134,10 +134,20 @@ $\begin{pmatrix}
 
 They look quite similar to each other.
 
-And essential should be $E = K^{T}FK = $
+And essential should be $E = K^{T}FK = \begin{pmatrix}
+1.01874798e+05 & 1.19131229e+05 &-7.34677901e+01\\
+4.38130472e+04 & 6.51566884e+04& -5.86572486e+01\\
+7.35402201e+01 & 5.87124923e+01 & 4.21477210e-08\\
+\end{pmatrix}$
 
 \subsection{Relative Pose}
-The relative pose should be as below:
+The relative pose should be:
+Rotation matrix = $\begin{pmatrix}
+0.00315& -0.00349& 0.61596\\
+0.00408& -0.00474& 0.049428 \\
+0.00819&-0.00568& 0.99995
+\end{pmatrix}$ 
+Transition matrix = $[0.51324; 0.41504; 0.83249]$
 
 We check the correctness with 'test five points'. 
 And the rotation matrix we get is:
@@ -166,7 +176,11 @@ They are almost the same.
 
 \subsection{Triangulated 3d map points}
 Suppose the triangulated 3d map points is $X$, then $x = PX$, $X = P^{-1}x$. $P$ should be the correct relative pose between two frames.
-And we set some examples here.
+%And we set some examples here.
+
+%In the previous image, $x = $, and its corresponding 3D location should be $X = $.
+
+%In the next image, $x = $, and its corresponding 3D location should be $X = $.
 
 
 	

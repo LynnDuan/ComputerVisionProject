@@ -4,13 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/test/KLT.cpp" "/home/duanlind/Downloads/practice_for_visualcomputing/assignment_04/simple_visual_odometry/build/CMakeFiles/klt.dir/test/KLT.cpp.o"
+  "/Users/duanlin/duanlin/class/CMPT_742/code/assignment_05/simple_visual_odometry/test/KLT.cpp" "/Users/duanlin/duanlin/class/CMPT_742/code/assignment_05/simple_visual_odometry/build/CMakeFiles/klt.dir/test/KLT.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "Clang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/usr/include/opencv"
+  "/usr/local/include/opencv"
+  "/usr/local/include"
   )
 
 # Targets to which this target links.
