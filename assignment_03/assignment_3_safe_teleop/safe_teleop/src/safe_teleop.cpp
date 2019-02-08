@@ -1,8 +1,4 @@
-/**
- * @file safe_teleop.cpp
- * @brief Safe teleoperation library implementation
- * Created by rakesh on 28/09/18.
- */
+
 #include <limits>
 #include <safe_teleop/safe_teleop.h>
 
