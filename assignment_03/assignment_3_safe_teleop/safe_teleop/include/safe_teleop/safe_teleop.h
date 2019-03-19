@@ -1,8 +1,4 @@
-/**
- * @file safe_teleop.h
- * Header for safe_teleop library
- * Created by rakesh on 28/09/18.
- */
+
 
 #ifndef SAFE_TELEOP_SAFE_TELEOP_NODE_H
 #define SAFE_TELEOP_SAFE_TELEOP_NODE_H

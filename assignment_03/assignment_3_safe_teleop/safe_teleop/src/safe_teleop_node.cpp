@@ -1,8 +1,3 @@
-/**
- * @file safe_teleop_node.cpp
- * @brief ROS Node using the safe teleop library
- * Created by rakesh on 28/09/18.
- */
 
 #include <ncurses.h>
 #include <cstring>
