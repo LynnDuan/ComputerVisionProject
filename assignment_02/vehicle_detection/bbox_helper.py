@@ -39,7 +39,7 @@ def generate_prior_bboxes():
         layer_feature_dim = layer_cfg['feature_dim_hw']
         layer_aspect_ratio = layer_cfg['aspect_ratio']
 
-        # TODO: compute S_{k} (reference: SSD Paper equation 4.)
+        # compute S_{k} (reference: SSD Paper equation 4.)
         fk = layer_feature_dim[0]
         # sk = 0.2 + 0.7*feat_level_idx/(len(prior_layer_cfg)-1)
         sk = layer_cfg['bbox_size'][0]/300
@@ -47,13 +47,13 @@ def generate_prior_bboxes():
         for y in range(0, layer_feature_dim[0]):
             for x in range(0, layer_feature_dim[0]):
 
-                # TODO: compute bounding box center
+                # compute bounding box center
                 cx = (x+0.5) / fk
                 cy = (y+0.5) / fk
                 # ar = 1
                 priors_bboxes.append([cx, cy, sk, sk])
 
-                # TODO: generate prior bounding box with respect to the aspect ratio
+                # generate prior bounding box with respect to the aspect ratio
                 for aspect_ratio in layer_aspect_ratio:
                     h = sk/np.sqrt(aspect_ratio)
                     w = sk*np.sqrt(aspect_ratio)
@@ -159,7 +159,7 @@ def match_priors(prior_bboxes: torch.Tensor, gt_bboxes: torch.Tensor, gt_labels:
    assert prior_bboxes.dim() == 2
    assert prior_bboxes.shape[1] == 4    
    gt_iou = torch.empty((gt_bboxes.shape[0], prior_bboxes.shape[0]))    
-   # TODO: implement prior matching
+   # implement prior matching
    for idx in range(0, gt_bboxes.shape[0]):
        gt_bboxes_sample = torch.unsqueeze(gt_bboxes[idx], 0)
        gt_iou[idx] = iou(prior_bboxes, gt_bboxes_sample)    

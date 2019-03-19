@@ -33,7 +33,7 @@ class SSD(nn.Module):
                 nn.Conv2d(in_channels=128, out_channels=256, kernel_size=3, stride=2, padding=1),
                 nn.ReLU()
             ),
-            # TODO: implement two more layers.
+            # implement two more layers.
             # Conv10_2
             nn.Sequential(
                 nn.Conv2d(in_channels=256, out_channels=128, kernel_size=1),
@@ -56,7 +56,7 @@ class SSD(nn.Module):
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * 4, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=512, out_channels=num_prior_bbox * 4, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=512, out_channels=num_prior_bbox * 4, kernel_size=3, padding=1),
-            # TODO: implement remaining layers.
+            # implement remaining layers.
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * 4, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * 4, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * 4, kernel_size=3, padding=1)
@@ -67,13 +67,13 @@ class SSD(nn.Module):
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * num_classes, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=512, out_channels=num_prior_bbox * num_classes, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=512, out_channels=num_prior_bbox * num_classes, kernel_size=3, padding=1),
-            # TODO: implement remaining layers.
+            # implement remaining layers.
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * num_classes, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * num_classes, kernel_size=3, padding=1),
             nn.Conv2d(in_channels=256, out_channels=num_prior_bbox * num_classes, kernel_size=3, padding=1),
         ])
 
-        # TODO: load the pre-trained model for self.base_net, it will increase the accuracy by fine-tuning
+        # load the pre-trained model for self.base_net, it will increase the accuracy by fine-tuning
         # self.base_net.cuda()
         pretrained_dict = torch.load('./pretrained/mobienetv2.pth')
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if 'base_net' in k}
@@ -139,13 +139,13 @@ class SSD(nn.Module):
         confidence_list.append(confidence)
         loc_list.append(loc)
 
-        # TODO: implement run the backbone network from [11 to 13] and compute the corresponding bbox loc and confidence
+        # implement run the backbone network from [11 to 13] and compute the corresponding bbox loc and confidence
         y = module_util.forward_from(self.base_net.conv_layers, self.base_output_layer_indices[0], self.base_output_layer_indices[1], y)
         confidence, loc = self.feature_to_bbbox(self.loc_regressor[1], self.classifier[1], y)
         confidence_list.append(confidence)
         loc_list.append(loc)
 
-        # TODO: forward the 'y' to additional layers for extracting coarse features
+        # forward the 'y' to additional layers for extracting coarse features
         for i in range(4):
             y = module_util.forward_from(self.additional_feat_extractor, i, i+1, y)
             confidence, loc = self.feature_to_bbbox(self.loc_regressor[i+2], self.classifier[i+2], y)

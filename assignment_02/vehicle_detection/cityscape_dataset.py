@@ -13,7 +13,7 @@ class CityScapeDataset(Dataset):
     def __init__(self, dataset_list, train, show):
         self.dataset_list = dataset_list
 
-        # TODO: implement prior bounding box
+        # prior bounding box
         self.prior_bboxes = generate_prior_bboxes()
 
         # Pre-process parameters:
@@ -36,7 +36,7 @@ class CityScapeDataset(Dataset):
         :return bbox_label: matched classification label, dim: (num_priors)
         """
         
-        # TODO: implement data loading
+        # data loading
         # 1. Load image as well as the bounding box with its label
         item = self.dataset_list[idx]
         img_path = item['img']

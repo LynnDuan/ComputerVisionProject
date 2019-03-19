@@ -61,7 +61,6 @@ class MultiboxLoss(nn.Module):
         conf_loss = F.cross_entropy(sel_conf.reshape(-1, num_classes), gt_class_labels[sel_flag].long(), size_average=False) / num_pos
  
         # Loss for the bounding box prediction
-        # TODO: implementation on bounding box regression
         pos_pre_loc = pred_loc[pos_flag].view(-1, 4)
         pos_gt_bbox = gt_bbox_loc[pos_flag].view(-1, 4)
         loc_huber_loss = F.smooth_l1_loss(pos_pre_loc, pos_gt_bbox, size_average=False) / num_pos
